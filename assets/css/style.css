@@ -498,7 +498,7 @@ p {
 
 #about .div-img-bg {
   padding-bottom: 30px;
-  border: 20px solid #b8a07e;
+  border: 20px solid #B76D36;
 }
 
 #about .div-img-bg .about-img img {
@@ -551,7 +551,7 @@ p {
 
 .services-block i {
   font-size: 44px;
-  color: #b8a07e;
+  color: #B76D36;
   line-height: 44px;
 }
 
@@ -564,10 +564,10 @@ p {
   height: 12px;
   background-color: #fff;
   opacity: 1;
-  border: 1px solid #b8a07e;
+  border: 1px solid #B76D36;
 }
 .services-slider .swiper-pagination .swiper-pagination-bullet-active {
-  background-color: #b8a07e;
+  background-color: #B76D36;
 }
 
 /*--------------------------------------------------------------
@@ -598,7 +598,7 @@ p {
   transition: all 0.3s ease-in-out;
 }
 #portfolio #portfolio-flters li:hover, #portfolio #portfolio-flters li.filter-active {
-  color: #b8a07e;
+  color: #B76D36;
 }
 #portfolio #portfolio-flters li:last-child {
   margin-right: 0;
@@ -634,7 +634,7 @@ p {
   right: 40px;
   font-size: 24px;
   top: calc(50% - 18px);
-  color: #b8a07e;
+  color: #B76D36;
 }
 #portfolio .portfolio-item .portfolio-info .preview-link:hover, #portfolio .portfolio-item .portfolio-info .details-link:hover {
   color: #cab89f;
