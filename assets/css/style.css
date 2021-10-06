@@ -140,7 +140,9 @@ p {
 .main-content {
   padding-top: 140px;
 }
-
+div, a{
+  vertical-align: top;
+}
 /*--------------------------------------------------------------
 # Back to top button
 --------------------------------------------------------------*/
@@ -151,7 +153,7 @@ p {
   right: 15px;
   bottom: 15px;
   z-index: 996;
-  background: #b8a07e;
+  background: #B76D36;
   width: 40px;
   height: 40px;
   border-radius: 4px;
@@ -163,7 +165,7 @@ p {
   line-height: 0;
 }
 .back-to-top:hover {
-  background: #c6b398;
+  background: #B76D36;
   color: #fff;
 }
 .back-to-top.active {
