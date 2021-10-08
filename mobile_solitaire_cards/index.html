@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html manifest="cache.manifest">
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Solitaire Card Game - Dad's</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A different kind of solitaire, created using jquery and the twitter bootstrap, available on desktop and on mobile devices.">
+    <meta name="author" content="John Flottmeyer">
+
+    <!-- Le styles -->
+    <!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />-->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 80px;
+      }
+    </style>
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <!--<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>-->
+          <a class="brand" href="#">Solitaire</a>
+          <div class="scorers">H<span class="badge Hbadge">0</span>D<span class="badge Dbadge">0</span> C<span class="badge Cbadge">0</span>S<span class="badge Sbadge">0</span></div>
+          <div class="nav-collapse collapse">
+            <!--<ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Action <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#" class="startGame">Start / Reset Game</a></li>
+                  <li><a href="#" class="undo disabled">Undo</a></li>
+                  <li><a href="#" class="deal disabled">Deal</a></li>
+                  <li class="divider"></li>
+                  <li class="nav-header">User Account</li>
+                  <li><a href="#" class="disabled">Save Game</a></li>
+                  <li><a href="#" class="disabled">Load Game</a></li>
+                  <li><a href="#" class="disabled">High Scores</a></li>
+                </ul>
+              </li>
+            </ul>-->
+            
+    
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+    
+    <div id="loading"><span></span></div>
+    <div id="begin" style="display:none;"><h3>Game Instructions</h3><p>Match up all of the cards of a suit, the first line can be any of the suit of the start card. You can open a new line with a card that matches the start card. You can only play the cards in a new row that are in the row before. Yellow outlined cards are playable, playing these unlocks the next card below.</p><a class="btn btn-primary btn-large   startGame" id="startGame">Start Game&raquo;</a></div>
+    <div id="win" style="display:none;"><h3>YOU WON</h3><p>Click below to play again</p><a class="btn btn-primary replayGame">New Game&raquo;</a></div>
+    <div id="redogame" style="display:none;"><h3>Reset Game?</h3><p>Would you like to reset the game? Warning - by clicking yes your current game will get erased to create a new game!</p><div class="btn-group"><a class="btn btn-primary closewindow">No Thanks!</a><a class="btn btn-primary newGame replayGame btn-danger"><i class="icon-exclamation-sign icon-white"></i> Yes Please!</a></div></div>
+<div class="row"><div class="span10" id="feedback"></div></div>
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <div class="row">
+
+        <!--left dealer area-->
+          <div class="span2 dealerarea">
+          <!--<h2>Gallery</h2>
+          <p>click a card to add it to the matching suit.</p>-->
+          <div id="gutterspace0">
+          <ul class="cards">
+          </ul>
+          </div>
+          <div id="gutterspace1">
+           <ul class="cards">
+           </ul>
+          </div>
+          <div id="gutterspace2">
+           <ul class="cards">
+           </ul>
+          </div>
+          <div id="gutterspace3">
+           <ul class="cards">
+           </ul>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <!--right card place slots-->
+          <div class="span10 playarea">
+          <div id="row1"><ul class="cards"></ul></div>
+          <div id="row2"><ul class="cards"></ul></div>
+          <div id="row3"><ul class="cards"></ul></div>
+          <div id="row4"><ul class="cards"></ul></div>
+        </div>
+        </div>
+      </div>
+    <div class="row">
+    <div class="span12">
+      
+    <div class="btn-group row-fluid">
+ 
+   
+     <!--<a class="btn btn-primary btn-large pull-left startGame" id="startGame" style="display:none;">Start Game&raquo;</a>
+      <a class="btn btn-primary btn-large pull-left deal" id="deal" style="display:none;"> Deal&raquo;</a>-->
+     <!--<a class="btn btn-primary btn-large pull-left undo disabled" id="undo" style="display:none;"> &laquo;Undo</a>
+     <a class="btn btn-primary btn-large disabled pull-left" id="save" style="display:none;">Save &raquo;</a>-->
+    </div>
+    </div>
+    </div>
+	<div class="row">
+    <div class="span12" id="cardgutter">
+    
+    <!--draw cards-->
+       <div class="cardmask" id="cardmask">
+        	<ul class="cards">
+           </ul>
+           </div>
+           <a class="btn btn-primary deal cardback" id="deal">Deal <i class="icon-forward icon-white"></i></a>
+    </div>
+    <div class="span12" id="options" style="display:none;">
+    <div class="span3">
+    <label>Reset Game</label>
+           <a class="btn btn-custom newGame" id="newGame" style="display:none;"><i class="icon-exclamation-sign icon-white"></i> New Game</a>
+    </div>
+   <!-- <div class="span3">
+      <label>Deal Amount (beta)</label>
+      <div class="btn-group">
+      <a class="btn active" class="card3" id="card3">3 card</a>
+      <a class="btn" class="card5" id="card5">5 card</a>
+      </div>
+      </div>-->
+     <!-- <div class="span3">
+      <label>Difficulty (not active)</label>
+       <div class="btn-group">
+      <a class="btn">Easy</a>
+      <a class="btn">Medium</a>
+      <a class="btn active">Hard</a>
+      </div>
+      </div>-->
+    </div>
+    </div>
+   <!--<div class="row">
+    <div class="span12">
+    <h2>About</h2>
+    <p>This was my dad's favorite solitaire game - he'd play it numerous times on Saturday mornings, while drinking coffee out of some seventies green plastic coffee cups that we used to have. I fell in love with this version of solitaire but one thing about it is that you need to shuffle the cards alot because you frequently end up in dead end situations. So I figured after working with flash that the easiest way to get the cards shuffled short of a card shuffler (which by the way is a pretty bad investment though still a fun device) is to programmically do it. So I started in flash but really wanted to be able to play on my ipod.</p>
+    </div>
+    </div>-->
+      <footer>
+        <p></p>
+      </footer>
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    
+<!--<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>-->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/spin.js.min.js"></script>
+    <script src="assets/js/cardgame_2.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+  
+
+  </body>
+</html>

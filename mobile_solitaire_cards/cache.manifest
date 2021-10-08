@@ -1,0 +1,28 @@
+CACHE MANIFEST
+# these are the files that the game uses
+assets/css/bootstrap.css
+assets/css/bootstrap-responsive.css
+#js files
+assets/js/jquery.js
+assets/js/spin.js.min.js
+assets/js/cardgame_2.js
+assets/js/bootstrap-transition.js
+assets/js/bootstrap-alert.js
+assets/js/bootstrap-modal.js
+assets/js/bootstrap-dropdown.js
+assets/js/bootstrap-scrollspy.js
+assets/js/bootstrap-tab.js
+assets/js/bootstrap-tooltip.js
+assets/js/bootstrap-popover.js
+assets/js/bootstrap-button.js
+assets/js/bootstrap-collapse.js
+assets/js/bootstrap-carousel.js
+assets/js/bootstrap-typeahead.js
+#images
+assets/images/card_bkg.png
+assets/images/cardtop.jpg
+assets/images/appletexture.jpg
+assets/img/heart.png
+assets/img/diamond.png
+assets/img/club.png
+assets/img/spade.png

@@ -1,0 +1,301 @@
+@charset "UTF-8";
+/* CSS Document ♠♥♦♣*/
+/***********PAGEELEMENTS************/
+body {
+	margin:0px;
+	padding:0px;
+	background: #000000; /* Old browsers */
+	background: -moz-linear-gradient(top, #000000 0%, #363338 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #000000), color-stop(100%, #363338)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #000000 0%, #363338 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #000000 0%, #363338 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #000000 0%, #363338 100%); /* IE10+ */
+	background: linear-gradient(top, #000000 0%, #363338 100%); /* W3C */
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#363338', GradientType=0 ); /* IE6-9 */
+	font-family:Arial, Helvetica, sans-serif;
+}
+.wrapper {
+	font-family:Arial, Helvetica, sans-serif;
+	width:960px;
+	padding:10px;
+	/*background:url(../images/pokertable.jpg) #EBEBEB;*/
+	background: #299a0b; /* Old browsers */
+	background: -moz-linear-gradient(45deg, #299a0b 0%, #104f06 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, #299a0b), color-stop(100%, #104f06)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(45deg, #299a0b 0%, #104f06 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(45deg, #299a0b 0%, #104f06 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(45deg, #299a0b 0%, #104f06 100%); /* IE10+ */
+	background: linear-gradient(45deg, #299a0b 0%, #104f06 100%); /* W3C */
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#299a0b', endColorstr='#104f06', GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	margin:0px auto;
+	/*overflow:hidden;*/
+	-moz-box-shadow: 3px 3px 4px #000;
+	-webkit-box-shadow: 3px 3px 4px #000;
+	box-shadow: 3px 3px 4px #000;
+	/* For IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+	/* For IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
+}
+.wrapper h1 {
+	margin:5px 0px;
+	padding:5px;
+	font-size:20px;
+	font-color:#FFF;
+	text-transform:uppercase;
+	background:#888;
+	display:block;
+}
+.leftcolumn {
+	width:300px;
+	/*background:url(../images/pokertable2.jpg);*/
+background: #104f06; /* Old browsers */
+	background: -moz-linear-gradient(top, #104f06 0%, #299a0b 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #104f06), color-stop(100%, #299a0b)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #104f06 0%, #299a0b 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #104f06 0%, #299a0b 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #104f06 0%, #299a0b 100%); /* IE10+ */
+	background: linear-gradient(top, #104f06 0%, #299a0b 100%); /* W3C */
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#104f06', endColorstr='#299a0b', GradientType=0 ); /* IE6-9 */
+	padding-bottom:150px;
+	float:left;
+	position:relative;
+}
+.rightcolumn {
+	width:600px;
+	float:left;
+}
+.cardslot {
+	margin:0px;
+	padding:0px;
+}
+.cardslot li {
+	list-style:none;
+	border:1px solid #000;
+	margin:10px;
+	height:100px;/*background:#CCC;*/
+}
+.cardplace {
+	margin:0px;
+	padding:0px;
+}
+.cardplace li {
+	list-style:none;
+	border:1px solid #000;
+	margin:10px;
+	padding:10px;
+	height:103px;
+}
+.cardplace ul {
+	display:block;
+	height:100px;
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 50px;
+}
+.cardplace li li {
+	border:1px solid #000;
+	border:none;
+	width:75px;
+	float:left;
+	position:relative;
+	margin:0px 0px 0px -50px;
+	padding:0px;
+}
+.draggable {
+	position:relative;
+}
+.drop1, .drop2, .drop3{
+	position:relative;
+	border:4px solid #FF0000;
+	display:block;
+	height:100px;
+}
+.feedback {
+	border:1px solid #FF0000;
+	padding:5px;
+	margin:7px;
+	color:#FFF;
+	font-weight:bold;
+	/*position:absolute;*/
+	left:200px;
+	float:left;
+	right:0px;
+	top:30px;
+	width:600px;
+	font-size:10px;
+}
+/***********BUTTONS************/
+.getcards {
+	height:100px;
+	width:75px;
+	border:2px solid #000;
+	margin:0px 10px;
+	float:left;
+	display:none;
+	background:url(../images/cardback.jpg);
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+}
+.shuffle {
+	margin:3px;
+	padding:5px;
+	background:#FF0000;
+	color:#FFF;
+	display:block;
+	width:100px;
+	float:left;
+	/*position:absolute;*/
+	top:3px;
+	right:0;
+	z-index:99999;
+}
+.blackbar {
+	background:#000;
+	height:40px;
+	margin:0px auto;
+}
+.blackbar .holder {
+	width:800px;
+	margin:0px auto;
+}
+/***********DECK***************/
+.card {
+	border:1px solid #000;
+	width:75px;
+	height:95px;
+	margin:0px 5px;
+	float:left;
+	position:absolute;
+	background: #ffffff; /* Old browsers */
+	background: -moz-linear-gradient(top, #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(47%, #f6f6f6), color-stop(100%, #ededed)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* IE10+ */
+	background: linear-gradient(top, #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* W3C */
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed', GradientType=0 ); /* IE6-9 */
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 3px 3px 4px #000;
+	-webkit-box-shadow: 3px 3px 4px #000;
+	box-shadow: 3px 3px 4px #000;
+	/* For IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+	/* For IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
+}
+.suitH {
+	color:#FF0000;
+	background:url(../images/suits.png) #FFF -75px 0px;
+	text-indent:5px;
+	padding-top:5px;
+}
+.suitD {
+	color:#FF0000;
+	background:url(../images/suits.png) #FFF 0px 100px;
+	text-indent:5px;
+	padding-top:5px;
+}
+.suitS {
+	color:#000;
+	background:url(../images/suits.png) #FFF 0px 0px;
+	text-indent:5px;
+	padding-top:5px;
+}
+.suitC {
+	color:#000;
+	background:url(../images/suits.png) #FFF -75px 100px;
+	text-indent:5px;
+	padding-top:5px;
+}
+/***********TABLE**************/
+#cardgutter {
+	float:left;
+	display:block;
+	position:relative;
+}
+#cardspace1, #cardspace2, #cardspace3 {
+	display:block;
+	border:2px solid #CCC;
+	position:relative;
+}/*{overflow:hidden;*/
+
+.cardspace0 {
+	margin-left:-130px;
+	position:relative;
+}
+.rows24startcard{
+	margin-left:-25px;
+}
+.cardinner {
+	margin-left:-130px;
+}
+.clear {
+	clear:both;
+}
+/* button 
+---------------------------------------------- */
+.button {
+	display: inline-block;
+	zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
+ *display: inline;
+	vertical-align: baseline;
+	margin: 3px 2px;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	font: 14px/100% Arial, Helvetica, sans-serif;
+	padding: .5em 2em .55em;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+	-webkit-border-radius: .5em;
+	-moz-border-radius: .5em;
+	border-radius: .5em;
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+	-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+}
+.button:hover {
+	text-decoration: none;
+}
+.button:active {
+	position: relative;
+	top: 1px;
+}
+.bigrounded {
+	-webkit-border-radius: 2em;
+	-moz-border-radius: 2em;
+	border-radius: 2em;
+}
+.medium {
+	font-size: 12px;
+	padding: .4em 1.5em .42em;
+}
+.small {
+	font-size: 11px;
+	padding: .2em 1em .275em;
+}
+/* red */
+.red {
+	color: #faddde;
+	border: solid 1px #980c10;
+	background: #d81b21;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ed1c24), to(#aa1317));
+	background: -moz-linear-gradient(top, #ed1c24, #aa1317);
+ filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#ed1c24', endColorstr='#aa1317');
+}
+.red:hover {
+	background: #b61318;
+	background: -webkit-gradient(linear, left top, left bottom, from(#c9151b), to(#a11115));
+	background: -moz-linear-gradient(top, #c9151b, #a11115);
+ filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c9151b', endColorstr='#a11115');
+}
+.red:active {
+	color: #de898c;
+	background: -webkit-gradient(linear, left top, left bottom, from(#aa1317), to(#ed1c24));
+	background: -moz-linear-gradient(top, #aa1317, #ed1c24);
+ filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#aa1317', endColorstr='#ed1c24');
+}
