@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<title>Gibby Go Fish</title>
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+<meta charset="utf-8">
+<head>
+<link rel="stylesheet" href="assets/css/jquery.mobile-1.4.2.min.css">
+<link rel="stylesheet" href="assets/css/gofish.css" type="text/css">
+<link rel="stylesheet" href="assets/css/toastr.css" type="text/css">
+<script type="text/javascript" src="assets/js/jquery.js"></script>
+<script type="text/javascript" src="assets/js/jquery.mobile-1.4.2.min.js"></script>
+<script type="text/javascript" src="assets/js/toastr.js"></script>
+<script src="assets/js/gofish3.js"></script>
+</head>
+<body>
+<!-- start page -->
+<div data-role="page" id="main" data-theme="a" class="ui-body-white">
+<div class="introtext"><img src="assets/images/go-fish-head.png" class="home-graphic" alt="Gibby's Go Fish"/></div>
+<div role="main" class="ui-content">
+      <div class="ui-body ui-body-a ui-center">  
+<h2 class="intro-title">Beat the fish to the hook</h2>
+<p class="introfont">Play <strong>Go Fish</strong> with the help of <strong>Gibson's Water Care's</strong> "Gibby" the Fish.</p>
+<form>
+<div class="ui-field-contain text-name-label">
+<label for="text-name"><strong>Name:</strong> (8 characters or less)</label>
+<input name="text-name" id="text-name" value="" placeholder="Your Name" type="text">
+</div>
+</form>
+<a href="#play" class="ui-btn ui-shadow ui-btn-b ui-corner-all play" data-transition="slide">Start Game</a>
+      </div>
+      <p class="small">Copyright 2014. All Rights Reserved. Designed by Voila! Media Group.</p>
+</div>
+</div>
+<!-- / start page -->
+
+<!-- page play -->
+<div data-role="page" id="play" data-theme="a">
+
+<!--button popup -->
+<div data-role="popup" id="popupInfo" class="ui-content go-fish-button" data-dismissible="false" data-theme="b">
+<div data-type="horizontal" data-role="controlgroup" class="ui-mini">
+  <a href="#" class="ui-btn searchfor" id="" data-rel="back">Do you have any <span class="cardname"></span>'s ?</a>
+  <a href="#" class="ui-btn ui-btn-icon-left ui-icon-delete" data-rel="back">Cancel</a>
+</div>
+</div>
+<!--end popup-->
+
+<div data-role="header" id="head" data-theme="b">
+<a href="#main" id="options" class="ui-btn ui-btn-icon-notext ui-icon-home ui-mini">Home</a>
+<div class="turn"><span><p></p><a href="#popupTurn" data-rel="popup" data-transition="slideup" class="ui-btn ui-nodisc-icon ui-btn-inline ui-icon-info ui-mini ui-btn-icon-left" title="Learn more" style="">turn info</a></span></div><span class="ui-title"></span>
+<a href="#help" data-display="push" id="helpoptions" class="ui-btn  ui-btn-icon-notext ui-icon-bars ui-btn-right">Help</a>
+</div>
+
+<!--help panel data-position-fixed="true" data-display="overlay" style="margin-top:0px;" -->
+<div data-role="panel" id="help" data-position="right">
+<a href="#" data-rel="close" class="ui-btn ui-icon-delete ui-btn-icon-right">Close menu</a>
+<h3>How to Play</h3>
+<strong>Quick Play</strong>
+<p>Click one of your cards to ask Gibby to see if he has that card. If he doesn't he'll tell you to go fish and you will draw from the go fish deck. If you find the card that you requested you get to take another turn. If Gibby has the card you are looking for you also get to take another turn. Once you collect 4 suits for a card you have a complete book. You can win the game by getting more books that Gibby has.</p>
+<h3>Interface</h3>
+<strong>User Hand</strong>
+<p><img src="assets/images/sample_card.png" class="helpimg" alt="Sample card">Your cards are displayed as a collection. Your cards are listed from Ace to King. The highlighted suits are the cards that you have.</p> <ol style="list-style-type:lower-alpha"><li>This is the Card. (8)</li><li>This is the number of suits you have for that card. (1)</li><li>These are the suits that you have for this card. (club)</li></ol>
+<strong>Turn Info</strong>
+<p><img src="assets/images/message_info.png" class="helpimg" alt="Turn info"/>This will tell you turn by turn what is happening. Don't worry if you miss the message that comes up click the (i) icon to see a full list of turns.</p>
+<strong>Books</strong>
+<p>A collection of four cards of the same number is called a book. This keeps track of your and Gibby's books. The player with the most books wins the game.</p>
+</div>
+<!-- /panel -->
+
+<!--turn popup-->
+<div data-role="popup" id="popupTurn" data-theme="b" data-dismissible="false" data-overlay-theme="b">
+<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right ui-btn-b">Close</a>
+<div style="padding:10px 10px;">
+<strong>Turns Taken</strong><br/>
+	<ol class="response" type="1">
+	</ol>
+
+</div>
+</div>
+<!-- /popup -->
+
+
+<div role="main" class="ui-content">
+      <div class="ui-body ui-body-a ui-corner-all insidetext"> 
+      	  <div id="dealerbooks"><span class="booklabel">Books</span><span class="booktotal">0</span></div>
+      	  <div id="userbooks"><span class="booklabel">Books</span><span class="booktotal">0</span></div>
+		  <div id="dealerhand"></div>
+		  <div class="gofishpile"><div class="stack ui-corner-all"></div></div>
+		  <div id="userhand"></div>
+		  <div id="newuserhand">
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn A" data-rel="popup" data-transition="pop">
+			    <span class="digit">A</span> 
+			    <span class="ui-count">0</span>
+			    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 2" data-rel="popup" data-transition="pop">
+			    <span class="digit">2</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 3" data-rel="popup" data-transition="pop">
+			    <span class="digit">3</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades  ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 4" data-rel="popup" data-transition="pop">
+			    <span class="digit">4</span> 
+			    <span class="ui-count">0</span>
+				<div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+				<a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 5" data-rel="popup" data-transition="pop">
+				<span class="digit">5</span> 
+				<span class="ui-count">0</span>
+					<div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+				</a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 6" data-rel="popup" data-transition="pop">
+			    <span class="digit">6</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 7" data-rel="popup" data-transition="pop">
+			    <span class="digit">7</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 8" data-rel="popup" data-transition="pop">
+			    <span class="digit">8</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 9" data-rel="popup" data-transition="pop">
+			    <span class="digit">9</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn 10" data-rel="popup" data-transition="pop">
+			    <span class="digit">10</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn J" data-rel="popup" data-transition="pop">
+			    <span class="digit">J</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn Q" data-rel="popup" data-transition="pop">
+			    <span class="digit">Q</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+				</div>
+			    </a>
+			    <a href="#popupInfo" class="ui-btn ui-btn-inline ui-corner-all ui-disabled ui-mini ui-shadow popupinfo my-tooltip-btn K" data-rel="popup" data-transition="pop">
+			    <span class="digit">K</span> 
+			    <span class="ui-count">0</span>
+				    <div class="suits">
+			    	<span class="icon-hearts ui-disabled h"></span>
+			    	<span class="icon-diamonds ui-disabled d"></span>
+			    	<span class="icon-clubs ui-disabled c"></span>
+			    	<span class="icon-spades ui-disabled s"></span>
+			    </div>
+			    </a>
+	</div>
+	<a href="#" class="ui-btn ui-btn-icon-left ui-icon-star ui-corner-all ui-shadow ui-btn-b ui-btn-inline reset">Reset</a>	
+</div>
+</div>
+</div><!-- /page -->
+
+<!--page-->
+
+<div data-role="page" id="win" data-theme="b" class="ui-body-white">
+<div data-role="header" id="winhead" data-theme="b">
+<a href="#main" id="winoptions" class="ui-btn ui-btn-icon-notext ui-icon-home ui-mini">Home</a>
+<span class="ui-title"></span>
+</div>
+<div role="main" class="ui-content">
+      <div class="ui-body ui-body-a ui-corner-all insidewin">  
+<h1 class="winner">Game Over</h1>
+<p class="details">game details</p>
+</div>
+
+<a href="#play" class="ui-btn ui-btn-icon-left ui-icon-star ui-corner-all ui-shadow ui-btn-b ui-btn-inline reset">Play Again?</a>
+</div>
+</div><!-- /page -->
+<script type="text/javascript">
+     app.initialize();
+</script>
+</body>
+</html>

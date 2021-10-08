@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <widget xmlns   = "http://www.w3.org/ns/widgets"
+        xmlns:gap   = "http://phonegap.com/ns/1.0"
+        id          = "com.phonegap.gofish"
+        versionCode = "10" 
+        version     = "1.0.1" >
+	
+    <name>Gibby's Go Fish</name>
+    <description>
+        A gofish game featuring Gibby the Fish
+    </description>
+
+    <author href="https://build.phonegap.com" email="johnflottmeyer@gmail.com">
+        John Flottmeyer
+    </author>
+    
+    <!-- third party plugins -->
+    <gap:plugin name="com.phonegap.plugin.statusbar" /> 
+    
+    <!-- universal preferences -->
+    <preference name="phonegap-version"           value="3.6.3" />         
+    <preference name="fullscreen"                 value="true" />
+	<preference name="orientation"                value="portrait" />  
+	
+	<!-- ios preferences --> 
+    <!-- ios: black-translucent will appear black because the PhoneGap webview doesn't go beneath the status bar -->     
+    <preference name="ios-statusbarstyle"         value="black-opaque" />  
+    
+    <!-- icons -->
+    <icon src="icons/ios/apple-touch-icon-57-precomposed.png" gap:platform="ios" width="57" height="57"/>
+    <icon src="icons/ios/apple-touch-icon-72-precomposed.png" gap:platform="ios" width="72" height="72"/>
+    <icon src="icons/ios/apple-touch-icon-114-precomposed.png" gap:platform="ios" width="114" height="114"/>
+    
+    <!-- splash screens -->
+    <gap:splash src="splash/ios/Default.png" gap:platform="ios" width="320" height="480"/>
+    <gap:splash src="splash/ios/Default_at_2x.png" gap:platform="ios" width="640" height="960"/>
+    <gap:splash src="splash/ios/Default_iphone5.png" gap:platform="ios" width="640" height="1136"/>
+    
+    <gap:splash src="splash/ios/Default-Landscape.png" gap:platform="ios" width="1024" height="748"/>
+    <gap:splash src="splash/ios/Default-Portrait.png" gap:platform="ios" width="768" height="1004"/>
+
+	<gap:splash src="splash/ios/Default-Landscape_at_2x.png" gap:platform="ios" width="2048" height="1496" />
+	<gap:splash src="splash/ios/Default-Portrait_at_2x.png" gap:platform="ios" width="1536" height="2008" />
+    
+</widget>

@@ -1,0 +1,504 @@
+@font-face {
+  font-family: "Open Sans Regular";
+  src: url('../fonts/OpenSans-Regular.ttf');/* relative path from the css file */
+}
+
+body{
+	font-family:Open Sans Regular, Arial, Helvetica;
+}
+/*HOME PAGE*/
+.text-name-label{
+	text-shadow:none;
+}
+.error{
+	color:#FF0000;
+}
+.introtext{width:100%;background:#01415d !important;margin:0px auto;text-align:center;display:block;}
+.home-graphic{max-width:100%;margin:0px auto !important;margin-bottom:-30px;position:relative;}
+.intro-title{
+	text-shadow:none !important;
+	font-size:40px;
+	margin:0px;
+	padding:0px;
+	text-transform:uppercase;
+	color:#FFF;
+}
+.small{font-size:11px;text-shadow:none;text-align:center;}
+.introtext{
+	background:url('../images/168825215_fade_white.jpg') #58a5af !important;
+}
+/*background-size:cover !important;*/
+.introfont{
+	font-size:20px;
+	text-shadow:none;
+	color:#01415d;
+}
+.ui-mobile-viewport, .ui-panel-wrapper{
+	background:url('../images/168825215_fade.jpg') no-repeat 0px 20px #01415d !important;background-size:contain !important;
+}
+.ui-body-white{
+	/*background:#FFF !important;*/
+	background: #fbb74e; /* Old browsers */
+background: -moz-linear-gradient(top,  #fbb74e 0%, #f8981d 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fbb74e), color-stop(100%,#f8981d)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #fbb74e 0%,#f8981d 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #fbb74e 0%,#f8981d 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #fbb74e 0%,#f8981d 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #fbb74e 0%,#f8981d 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fbb74e', endColorstr='#f8981d',GradientType=0 ); /* IE6-9 */
+
+}
+.ui-center{
+	text-align:center;
+}
+.ui-bar-b{
+	background:#03549f;
+	background: #abb7db; /* Old browsers */
+	background: -moz-linear-gradient(top,  #abb7db 0%, #03549f 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#abb7db), color-stop(100%,#03549f)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #abb7db 0%,#03549f 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #abb7db 0%,#03549f 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #abb7db 0%,#03549f 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #abb7db 0%,#03549f 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#abb7db', endColorstr='#03549f',GradientType=0 ); /* IE6-9 */
+
+	border-bottom:1px solid #000;
+	position:relative;
+	
+	-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+#head .ui-btn{
+  background-color: transparent !important;
+  border:none;
+}
+.turn{
+	position:absolute;
+	display:block;
+	height:60px;
+	width:200px;
+	left: 50%;	
+	margin-left: -100px;	
+	-webkit-box-shadow: 0 1px 10px rgba(0, 0, 10, 0.4);
+	-moz-box-shadow: 0 1px 10px rgba(0, 0, 10, 0.4);
+	box-shadow: 0 1px 10px rgba(0, 0, 10, 0.4);
+	-webkit-border-bottom-right-radius: 10px;
+	-webkit-border-bottom-left-radius: 10px;
+	-moz-border-radius-bottomright: 10px;
+	-moz-border-radius-bottomleft: 10px;
+	border-bottom-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+	background: #abb7db; /* Old browsers */
+	background: -moz-linear-gradient(top,  #abb7db 0%, #03549f 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#abb7db), color-stop(100%,#03549f)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #abb7db 0%,#03549f 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #abb7db 0%,#03549f 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #abb7db 0%,#03549f 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #abb7db 0%,#03549f 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#abb7db', endColorstr='#03549f',GradientType=0 ); /* IE6-9 */
+	border:1px solid #6884bd;
+	overflow:hidden;
+}
+.turn span{
+	background:#444;
+	border-radius:10px;
+	display:block;
+	width:160px;
+	height:30px;
+	position:relative;
+	margin:10px;
+	padding:0px 10px;
+	font-size:12px;
+	font-weight:normal;
+	overflow:hidden;
+	-moz-box-shadow:    inset 0 0 5px #000000;
+   -webkit-box-shadow: inset 0 0 5px #000000;
+   box-shadow:         inset 0 0 5px #000000;
+   border:1px solid #FFF;
+}
+.turn span p {
+/*border:1px solid #000;*/
+	margin:0px !important;
+	padding:0px !important;
+}
+.turn span p div{
+	/*border:1px solid #000;*/
+	padding:2px;
+}
+.turn span .ui-btn{
+	margin-top:0px !important
+}
+.turn span label.ui-btn{
+	padding-top:inherit !important;
+}
+/*.ui-page, .ui-body-a{
+      background:url('../images/168825215.jpg') #58a5af;background-size:cover;
+}*/
+.insidewin{
+	background:url('../images/gibby_win.png') no-repeat bottom right;
+	background-size:contain; 
+	min-height:300px;
+}
+.insidewin h1{
+	color:#FFF;
+	text-shadow:none;
+}
+.insidewin .details{
+	color:#FFF;
+	text-shadow:none;
+}
+
+.turns p{display:inline-block;padding:5px;text-align:center;}
+
+.gofishpile{background:rgba(0, 0, 0, 0.35);padding:5px 10px;position:relative;overflow:hidden;border-radius:10px;}
+.gofishpile .insidecard{position:absolute;left:0px;top:5px;font-weight:bold;}
+.gofishpile .insidecard .suits span{float:right;right:0px;position:relative;}
+
+/*border:1px solid #CCC;border-radius:5px;padding:10px;width:50%;*/
+/*PSUEDO ELEMENT STACK*/
+.stack {
+	background:url('../images/gibby_drawn.png') no-repeat center center #FFF;
+	background-size:60%;
+	padding:10px;
+	display:inline-block;
+	margin-left:-5px;
+	min-height:45px;
+	margin-top:100px;
+	min-width:30px; 
+	margin:5px auto; 
+	position: relative; 
+	z-index: 10;
+	
+	-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.innerstack{
+	background:#FFF;
+	background-size:60%;
+	padding:10px;
+	display:inline-block;
+	margin-left:-5px;
+	min-height:45px;
+	margin-top:100px;
+	min-width:30px; 
+	margin:5px auto; 
+	position: relative; 
+	z-index: 8;
+	
+	-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.stack, .innerstack{
+	-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.stack img{
+	max-width: 50%; height: auto; vertical-align: bottom; border: 5px solid #fff; border-radius: 3px;
+	padding:50% 0%;
+	border-radius:5px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.stack:last-of-type { margin-right: 0; }
+
+.stack:before { top: 4px; z-index: -10; } /* 1st element in stack (behind image) */	
+.stack:after { top: 8px; z-index: -20; } /* 2nd element in stack (behind image) */
+.gofishpiletemp{padding:10px 5px;width:100%;margin:0px auto;font-size:8px;}
+.gofishpiletemp p{display:inline-block;border-left:1px solid #ccc;padding:3px;margin:3px;}
+ol.response{height:80px;border:1px solid #555;overflow:scroll;padding:0px 20px;margin-top:5px;margin-left:0px;font-size:12px;width:180px;}
+.popupinfo{background:#FFF !important;}
+
+/*GIBBYS Cards*/
+.deck{list-style:none;margin:0px;padding:0px;position:relative;float:right;margin-top:110px;}
+.reset{background:#f8981d !important;color:#000;}
+.deck li.card{border-radius:5px;border:1px solid #888;display:block;background:url('../images/gibby_drawn.png') no-repeat center center #FFF;background-size:60%;padding:10px;display:inline-block;margin-left:-5px;min-height:35px;min-width:20px;box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.35);}
+
+/*BOOOKS */
+#dealerbooks{background:rgba(255, 255, 255, 0.55);border:1px solid #000;padding:0px 5px 0px 0px;border-radius:5px;min-height:20px;position:absolute;min-width:80px;z-index:100;text-shadow:none;color:#444;margin-left:10px;margin-top:10px;}
+#userbooks{background:rgba(255, 255, 255, 0.55);border:1px solid #000;padding:0px 5px 0px 0px;border-radius:5px;min-height:20px;position:absolute;min-width:80px;z-index:100;text-shadow:none;color:#444;margin-left:10px;margin-top:45px;}
+
+#dealerbooks span.booklabel,#userbooks span.booklabel{
+	background:url('../images/gibby_icon.png') no-repeat 4px 4px #f8981d;
+	background-size:30%;
+	/*background:#FFF;color:#000;border-right:2px solid #000;*/
+	-webkit-border-top-left-radius: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-topleft: 3px;
+	-moz-border-radius-bottomleft: 3px;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	border-right:1px solid #000;
+	padding:6px;
+	font-size:12px;
+	display:inline-block;
+	padding:6px 6px 6px 30px;
+}
+#userbooks span.booklabel,#userbooks span.booklabel{
+	background:url('../images/user_icon.png') no-repeat 4px 4px #a9b6d9;
+	background-size:30%;
+	padding:6px 6px 6px 30px;
+}
+.booktotal{
+	color:#FFF;
+	font-weight:bold;
+	font-size:12px;
+	background:transparent;
+	margin-left:5px;
+	border-radius:none;
+	-moz-border-radius:none;
+	-webkit-border-radius:none;
+}
+#userbooks div, #dealerbooks div{background:#CCC;border:1px solid #DDD;padding:5px;display:inline-block;max-width:40px;margin-right:5px;}
+/*Dealer Hand*/
+#dealerhand{
+	background:url('../images/big_gibbyb.png') top right no-repeat;
+	min-height:170px;
+	border-bottom:1px solid #FFF;
+	padding:5px 10px;
+	margin:0px auto;
+	z-index:200;
+	position:relative;
+	border-radius:10px;
+}/**/
+#userhand{border-top:1px solid #FFF;border-radius:10px;padding:5px 10px;margin:0px auto;}
+
+#play{
+	/*max-width:640px;*/
+}
+.ui-body-a{
+	background-color:rgba(255, 255, 255, 0.35);
+	background-color:transparent !important;
+	border:none;
+}
+.go-fish-button{
+	padding:3px;
+}
+.go-fish-button .ui-btn{
+	margin:0px;
+}
+.ui-icon-hearts:after {
+  	background: url('../images/icons/card_icons_hearts.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+  
+.ui-icon-diamonds:after {
+  	background: url('../images/icons/card_icons_diamonds.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+  
+.ui-icon-spades:after {
+  	background: url('../images/icons/card_icons_spades.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+  
+.ui-icon-clubs:after {
+  	background: url('../images/icons/card_icons_clubs.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+.turn-active{
+	background:#a9b6d9;
+	color:#FFF;
+}
+.AI span{display:block;padding:12px 10px 12px 50px;background:url('../images/gibby_icon.png') no-repeat 5px;border-bottom:1px solid #000;}
+.USER span{display:block;padding:12px 10px 12px 50px;background:url('../images/user_icon.png') no-repeat 5px;border-bottom:1px solid #000;}
+
+
+.suits span{
+	display:inline-block;
+	width:14px;
+	height:14px;
+}
+.suits{
+	white-space: normal;
+	margin-top:5px;
+	padding:0px 2px;
+	width:100%;
+	vertical-align:top;
+}
+
+.digit{
+	display:inline-block;
+	vertical-align:top;
+	font-size:25px;
+	width:65%;
+}
+.ui-btn.my-tooltip-btn{
+	padding:2px !important;
+	margin:3px;
+}
+.icon-hearts {
+  	background: url('../images/icons/card_icons_hearts.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+.icon-diamonds{
+  	background: url('../images/icons/card_icons_diamonds.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+.icon-clubs {
+  	background: url('../images/icons/card_icons_clubs.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+.icon-spades {
+  	background: url('../images/icons/card_icons_spades.png') no-repeat center center rgba(0, 0, 0, 0.0) !important;
+  	background-size: 14px 14px;
+}
+.ui-grid-c{
+	padding:5px;
+}
+.ui-count{
+	background:#ff0000;
+	position:relative;
+	top:-3px;
+	right:-3px;
+    min-width:14px;
+    display:inline-block;
+	width:20%;
+	vertical-align:top;
+    height: 14px;
+    color:#ffffff;
+    padding: 3px;
+    text-align: center;
+    font-size: 14px;
+    z-index:400;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.7);
+    -webkit-border-top-right-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	border-top-right-radius: 5px;
+	
+	border-bottom-left-radius: 5px;
+	border:1px solid #000;
+	-moz-box-shadow:    inset 0 0 5px #000000;
+   -webkit-box-shadow: inset 0 0 5px #000000;
+   box-shadow:         inset 0 0 5px #000000;
+}
+
+.ui-complete{
+	border:1px solid #009933 !important;
+	filter: Alpha(Opacity=100);
+	opacity: 1;
+}
+.ui-disabled .ui-count{
+	background:#CCC !important;
+}
+.ui-complete .ui-count{
+	background:#009933 !important;
+}
+
+#newuserhand{background:rgba(0, 0, 0, 0.55); border-radius:10px;padding:5px}
+#newuserhand .ui-btn{overflow:visible;padding:5px;background:#FFF;}
+.helpimg{
+	float:left;
+	margin-right:5px;
+}
+#help p, #help ol{
+	font-size:12px;
+}
+.ui-panel.ui-panel-open {
+    position:fixed;
+}
+.ui-panel-inner {
+    position: absolute;
+    top: 1px;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    overflow: scroll;
+    padding-top:0px !important;
+    -webkit-overflow-scrolling: touch;
+}
+.reviews{
+	text-align:center;
+}
+.reviews h2{
+	text-transform:uppercase;
+}
+@media (max-width: 359px) {
+.introfont{
+	font-size:12px;
+	text-shadow:none;
+	color:#01415d !important;
+	font-weight:bold;
+}
+.intro-title{
+	font-size:20px;
+	
+}
+.reviews h2{
+	font-size:15px;
+}
+#dealerbooks{margin-top:15px;}
+#userbooks{margin-top:45px;}
+	#dealerhand{background:url('../images/little_gibby.png') top right no-repeat;background-size:50%;min-height:80px;margin-top:15px;}
+	.ui-body{padding:0px;}
+	.suits{
+		max-width:40px;
+		margin:0px auto;
+		display:block;
+	}
+	.suits span{
+		display:inline-block;
+		width:7px;
+		height:7px;
+		margin:0px !important;
+		background-size:7px 7px !important;
+	}
+	.deck{margin-top:45px;}
+	.deck li.card{margin-left:-20px;margin-top:0px;min-height:10px;min-width:5px;}
+	.deck li:first-child{margin-left:0px;}
+	
+	.gofishpile{padding:4px 10px;}
+	.stack {
+		margin:2px 0px;
+		min-height:25px;
+		min-width:15px; 
+	}
+	.innerstack{
+		margin:0px;
+		margin-top:1px;
+		min-height:25px;
+		min-width:15px; 
+		padding:8px 9px 9px 9px;
+	}
+	.ui-count{
+	    min-width:10px;
+	    right:0px;
+	    height: 13px;
+	    color:#ffffff;
+	    padding:0px 2px 4px 2px;
+	    text-align: center;
+	    font-size: 12px;
+	    z-index:400;
+	}
+	.digit{
+		font-size:15px;
+		vertical-align: top;
+	}
+	.ui-grid-c{
+		padding:0px;
+		margin:0px;
+	}
+	.ui-btn.my-tooltip-btn{
+		padding:1px !important;
+		margin:2px;
+	}
+	/*.icon-hearts {
+	  	background-size: 10px 10px;
+	}
+	.icon-diamonds{
+	  	background-size: 10px 10px;
+	}
+	.icon-clubs {
+	  	background-size: 10px 10px;
+	}
+	.icon-spades {
+	  	background-size: 10px 10px;
+	}*/
+}
