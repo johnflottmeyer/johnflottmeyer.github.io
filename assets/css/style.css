@@ -12,7 +12,7 @@ body {
   background: #ffffff;
   color: #898989;
   font-family: "Poppins", helvetica;
-  font-size: 15px;
+  font-size: 1.2rem;
   font-weight: 300;
   line-height: 20px;
   letter-spacing: 0.02em;
@@ -52,6 +52,7 @@ p {
   padding: 0;
   font-size: 15px;
   color: #999999;
+  color: #000000;
   line-height: 28px;
 }
 
@@ -465,10 +466,30 @@ div, a{
 #hero {
   background-color: #75962B;
   background: linear-gradient(58deg,rgba(117, 150, 43, 1) 0%, rgba(117, 150, 43, 1) 52%, rgba(191, 222, 124, 1) 95%);
+  box-shadow: inset 0px -40px 30px #5d9634;
   height: 100vh;
   max-height: 800px;
   position: relative;
   width: 100%;
+}
+
+#hero:before{
+  background: linear-gradient(
+    to bottom,
+    #D9462B,
+    #D9462B 50%,
+    #2B66D9 50%,
+    #2B66D9
+  );  
+
+  background-size: 100% 100px;
+  bottom: 0;
+  content:"";
+  display: block;
+  height: 100px;
+  opacity: .5;
+  position: absolute;
+  width: 100%; 
 }
 .my-portrait{
   background: url(../img/home_image-me.png) right bottom / contain no-repeat scroll;
@@ -489,25 +510,27 @@ div, a{
   flex-direction: column;
   position: relative;
   z-index: 100;
-    
 }
 
 .hero-content h1 {
-  font-size: 40px;
-  font-weight: 700;
+  font-family: "Amatic SC", sans-serif;
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: 3px;
   margin-bottom: 10px;
   text-transform: uppercase;
   color: #fff;
 }
 
 .hero-content p {
+
   font-size: 13px;
   letter-spacing: 3px;
   margin-top: 0;
   margin-bottom: 30px;
   text-transform: capitalize;
   color: #fff;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .hero-content .list-social li {
@@ -604,6 +627,7 @@ div, a{
 }
 
 #about .about-descr .separator {
+  font-size: 15px;
   max-width: 80%;
   margin-bottom: 0;
   text-align: left;

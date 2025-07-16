@@ -13,8 +13,12 @@
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Edu+SA+Hand:wght@400..700&family=Patrick+Hand+SC&family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
+
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i&family=Patrick+Hand+SC&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -70,15 +74,11 @@
   <!-- ======= Hero Section ======= -->
   <div id="hero" class="home">
 
-        <div class="my-portrait"></div>
+    <div class="my-portrait"></div>
     <div class="container">
       <div class="hero-content">
-        <h1><span class="typed" data-typed-items="Hello - I'm John Flottmeyer,I'm a nice guy :),I'm a Web Designer,I'm a Painter,I'm a Web Developer,I'm a Multimedia Artist,I'm a Problem Solver,I'm an Application Developer,I'm a Tinkerer,I'm an Illustrator"></span></h1>
+        <h1><span class="typed" data-typed-items="Hello - I'm John Flottmeyer,I'm a Web Designer,I'm a Painter,I'm a Web Developer,I'm a nice guy :),I'm a Multimedia Artist,I'm a Problem Solver,I'm an Application Developer,I'm a Tinkerer,I'm an Illustrator"></span></h1>
         <p>Web Designer, Web Developer, Multimedia Artist, App Developer, Illustrator</p>  
-
-        <ul class="list-unstyled list-social">
-          <li><a href="https://www.linkedin.com/in/johnflottmeyer/"><i class="bi bi-linkedin"></i></a></li>
-        </ul>
         <div id="arrow-wrapper">
           <div class="arrow-border">
             </a><div class="arrow down"><a href="#about"></a></div>
@@ -116,78 +116,12 @@
         </div>
       </div>
     </div><!-- End About Section -->
-
-    <!-- ======= Services Section ======= -->
-    <!--<div id="services">
-      <div class="container">
-
-        <div class="services-slider swiper" data-aos="fade-up" data-aos-delay="100">
-          <div class="swiper-wrapper">
-
-            <div class="swiper-slide">
-              <div class="services-block">
-                <i class="bi bi-briefcase"></i>
-                <span>UI/UX DESIGN</span>
-                <p class="separator">To an English person, it will seem like simplified English,told me what </p>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="services-block">
-                <i class="bi bi-card-checklist"></i>
-                <span>BRAND IDENTITY</span>
-                <p class="separator">To an English person, it will seem like simplified English,told me what </p>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="services-block">
-                <i class="bi bi-bar-chart"></i>
-                <span>WEB DESIGN</span>
-                <p class="separator">To an English person, it will seem like simplified English,told me what </p>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="services-block">
-                <i class="bi bi-binoculars"></i>
-                <span>MOBILE APPS</span>
-                <p class="separator">To an English person, it will seem like simplified English,told me what </p>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="services-block">
-                <i class="bi bi-brightness-high"></i>
-                <span>Analytics</span>
-                <p class="separator">To an English person, it will seem like simplified English,told me what </p>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="services-block">
-                <i class="bi bi-calendar4-week"></i>
-                <span>PHOTOGRAPHY</span>
-                <p class="separator">To an English person, it will seem like simplified English,told me what </p>
-              </div>
-            </div>
-
-          </div>
-          <div class="swiper-pagination"></div>
-        </div>
-
-      </div>
-
-    </div><!-- End Services Section -->
-
     <!-- ======= Portfolio Section ======= -->
     <div id="portfolio" class="paddsection">
 
       <div class="container">
         <div class="section-title text-center">
           <h2>My Portfolio</h2>
-          <strong>Samples</strong>
-
         </div>
       </div>
 
@@ -196,12 +130,12 @@
         <div class="row">
           <div class="col-lg-12 d-flex justify-content-center">
             <ul id="portfolio-flters">
-              <li data-filter="*" class="filter-active">All</li>
-              <li data-filter=".filter-web">Web</li>
+              <li data-filter=".filter-web" class="filter-active" id="first-filter">Web</li>
               <li data-filter=".filter-app">App</li>
               <li data-filter=".filter-illus">Illustration</li>
               <li data-filter=".filter-tech">3d Printing / Tech</li>
-              <li data-filter=".filter-ads">Native Ads</li>
+              <!--<li data-filter=".filter-ads">Native Ads</li>-->
+              <li data-filter="*">All</li>
             </ul>
           </div>
         </div>
@@ -213,10 +147,8 @@
               <h4>Explorer Mindset</h4>
               <p>WordPress Custom Functionality</p>
               <a href="assets/img/portfolio/explorermindset.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Explorer Mindset - I set up a plug-in for this WordPress site which adds API connectivity directly to several functions. It also allows for connection to specific plug-ins in the website via custom API gateways. The app connects to WordPress when creating a user or logging in to set up an account if they are currently a user or authenticate if they already have an account set up. The app will sync the user's Mind Maps and Explorer Mindsets from the WordPress site to the app and vice versa."><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
-        <!--<div class="row portfolio-container">-->
           <div class="col-lg-4 col-md-6 portfolio-item filter-web">
             <img src="assets/img/portfolio/experiencesw.jpg" class="img-fluid" alt="Experience Southwest Website">
             <div class="portfolio-info">
@@ -224,7 +156,6 @@
               <p>WordPress Custom Functionality</p>
               <a href="assets/img/portfolio/experiencesw.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Experience Southwest Website - I created a plugin for this site to add the additional functionality of working with records created and stored on a 3rd party site. The client uses WildApricot to register community businesses, and collect dues for their accounts. My plug-in uses an API to gather the user's records nightly that want to be displayed on the site. 
               The plugin stores them in the database and also adds custom shortcodes to the theme to allow the display of categories in the templates."><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
           <div class="col-lg-4 col-md-6 portfolio-item filter-web">
@@ -233,7 +164,6 @@
               <h4>Hiawatha Homecare</h4>
               <p>WordPress Website</p>
               <a href="assets/img/portfolio/hiawathahomecare.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Hiawatha Home Care Website"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
 
@@ -245,7 +175,6 @@
               <h4>Chicone's Liquor Mart</h4>
               <p>WordPress Website</p>
              <a href="assets/img/portfolio/chicones-mobile.jpeg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Chicone's Liquor Mart Website"><i class="bx bx-plus"></i></a>
-               <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
 
@@ -255,7 +184,6 @@
               <h4>Apex Laboratory Equipment Company</h4>
               <p>WordPress Website</p>
               <a href="assets/img/portfolio/apexlec.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Apex Laboratory Equipment Website"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
 
@@ -265,7 +193,6 @@
               <h4>Discover Hudson, WI</h4>
               <p>WordPress Website</p>
               <a href="assets/img/portfolio/discoverhudson-mobile.jpeg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Discover Hudson, WI"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
 
@@ -275,7 +202,6 @@
               <h4>Harvest Tec, Inc</h4>
               <p>WordPress Website</p>
               <a href="assets/img/portfolio/harvestec-mobile.jpeg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="HarvestTec Inc"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
 
@@ -285,8 +211,7 @@
               <h4>Hudson Counseling</h4>
               <p>WordPress Website</p>
             <a href="assets/img/portfolio/hudsonscounseling-web.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Hudson Counseling Website"><i class="bx bx-plus"></i></a>
-               <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
-            </div>
+           </div>
           </div>
 
           <div class="col-lg-4 col-md-6 portfolio-item filter-web">
@@ -305,8 +230,7 @@
               <h4>Mangata Travel</h4>
               <p>WordPress Website</p>
               <a href="assets/img/portfolio/mangata-mobile.jpeg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Mangata Travel Website"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
-            </div>
+           </div>
           </div>
 
           <div class="col-lg-4 col-md-6 portfolio-item filter-web">
@@ -315,7 +239,6 @@
               <h4>River City Stitch</h4>
               <p>WordPress Website</p>
               <a href="assets/img/portfolio/rivercitystitch-mobile.jpeg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="River City Stitch Website"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
 
@@ -325,7 +248,6 @@
               <h4>St. Croix Gas Website</h4>
               <p>WordPress Website</p>
               <a href="assets/img/portfolio/stcroixgas-mobile.jpeg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="St. Croix Gas Website"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
             </div>
           </div>
           
@@ -378,7 +300,14 @@
               <a href="/mobile_solitaire_cards/" class="details-link" title="More Details" target="_blank"><i class="bx bx-link"></i></a>
             </div>
           </div>
-
+          <div class="col-lg-4 col-md-6 portfolio-item filter-illus">
+            <img src="assets/img/portfolio/study-for-oil-exodus.jpg" class="img-fluid" alt="Study for Oil Painting">
+            <div class="portfolio-info">
+              <h4>Exodus</h4>
+              <p>Oil on Canvas</p>
+              <a href="assets/img/portfolio/study-for-oil-exodus.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Study for Oil Painting - Mixed media on paper"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
           <div class="col-lg-4 col-md-6 portfolio-item filter-illus">
             <img src="assets/img/portfolio/painting-exodus-2024.jpg" class="img-fluid" alt="Oil Painting">
             <div class="portfolio-info">
@@ -387,7 +316,14 @@
               <a href="assets/img/portfolio/painting-exodus-2024.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Oil Painting - Exodus: Oil on Canvas 11 x 14"><i class="bx bx-plus"></i></a>
             </div>
           </div>
-          
+            <div class="col-lg-4 col-md-6 portfolio-item filter-illus">
+            <img src="assets/img/portfolio/studyfor-sunset-oil.jpg" class="img-fluid" alt="Study for Oil Painting">
+            <div class="portfolio-info">
+              <h4>Exodus</h4>
+              <p>Oil on Canvas</p>
+              <a href="assets/img/portfolio/studyfor-sunset-oil.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Oil Painting Study"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
           <div class="col-lg-4 col-md-6 portfolio-item filter-illus">
             <img src="assets/img/portfolio/dragons-breath.jpg" class="img-fluid" alt="Dragon's Breath">
             <div class="portfolio-info">
@@ -433,22 +369,55 @@
              
             </div>
           </div>
-          <div class="col-lg-4 col-md-6 portfolio-item filter-tech">
-            <img src="https://placehold.co/1200x747" class="img-fluid" alt="Tech">
-            <div class="portfolio-info">
-              <h4>Coming soon</h4>
-              <p>Tech Projects</p>
-              <a href="https://placehold.co/1200x747 data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="coming soon!"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
+         <!--<div class="col-lg-4 col-md-6 portfolio-item filter-ads">
+            <img src="assets/img/portfolio/sonoma-ad-page.jpg" class="img-fluid" alt="Ads">
+             <div class="portfolio-info">
+              <h4>Sonoma Native Ad</h4>
+              <p>Native ads</p>
+              <a href="assets/img/portfolio/sonoma-ad-page.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Native Ads on Sonoma, Large ad space on left, Content Landing Page on the right."><i class="bx bx-plus"></i></a>
             </div>
           </div>
+          <div class="col-lg-4 col-md-6 portfolio-item filter-ads">
+            <img src="assets/img/portfolio/pressdemocrat-ad-page.jpg" class="img-fluid" alt="Ads">
+             <div class="portfolio-info">
+              <h4>Press Democrat</h4>
+              <p>Native ads</p>
+              <a href="assets/img/portfolio/pressdemocrat-ad-page.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Native Ads on Press Democrat, Large ad space on left, Content Landing Page on the right."><i class="bx bx-plus"></i></a>
+             </div>
+          </div>
+           <div class="col-lg-4 col-md-6 portfolio-item filter-ads">
+            <img src="assets/img/portfolio/national-review-ad-page.jpg" class="img-fluid" alt="Ads">
+             <div class="portfolio-info">
+              <h4>National Review</h4>
+              <p>Native ads</p>
+              <a href="assets/img/portfolio/national-review-ad-page.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Native Ads on National Review, Generic placeholders - Large ad space on left, Content Landing Page on the right."><i class="bx bx-plus"></i></a>
+              </div>
+          </div>
             <div class="col-lg-4 col-md-6 portfolio-item filter-ads">
-            <img src="https://placehold.co/1200x747" class="img-fluid" alt="">
+            <img src="assets/img/portfolio/chch-ad-page.jpg" class="img-fluid" alt="Ads">
+             <div class="portfolio-info">
+              <h4>National Review</h4>
+              <p>Native ads</p>
+              <a href="assets/img/portfolio/chch-ad-page.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Native Ads on National Review, Generic placeholders - Large ad space on left, Content Landing Page on the right."><i class="bx bx-plus"></i></a>
+              </div>
+          </div>-->
+          <div class="col-lg-4 col-md-6 portfolio-item filter-tech">
+            <div style="padding:177.78% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1101978589?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="L0LA-59"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
             <div class="portfolio-info">
-              <h4>Coming soon</h4>
-              <p>Native Ads</p>
-              <a href="https://placehold.co/1200x747" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="coming soon!"><i class="bx bx-plus"></i></a>
-              <!--<a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>-->
+              <h4>L0LA-59 Droid</h4>
+              <p>3d printed, Programmed using Arduino set up on an Arduino Nano microcontroller.</p>
+            </div>
+          </div>
+           <div class="col-lg-4 col-md-6 portfolio-item filter-tech">
+            <img src="assets/img/portfolio/l0LA-still.jpg" class="img-fluid" alt="Tech"><div class="portfolio-info">
+              <h4>L0LA-59 Still image</h4>
+              <p>3d printed, Programmed using Arduino set up on an Arduino Nano microcontroller.</p>
+            </div>
+          </div>
+           <div class="col-lg-4 col-md-6 portfolio-item filter-tech">
+            <img src="assets/img/portfolio/ultron-helmet.jpg" class="img-fluid" alt="Tech"><div class="portfolio-info">
+              <h4>Ultron helmet</h4>
+              <p>3d printed, wired to include lighting</p>
             </div>
           </div>
        <!--</div>-->
@@ -458,93 +427,6 @@
     </div><!-- End Portfolio Section -->
 
     
-
-    <!-- ======= Interview Section ======= -->
-   <!-- <div id="interview" class="paddsection">
-      <div class="container">
-        <div class="contact-block1">
-          <div class="row">
-
-            <div class="col-lg-12">
-              <div class="get in touch" style="text-align:center;margin:0px auto">
-                <img src="assets/img/lower-mouse-small.jpg" style="max-width:300px;height:auto;margin:0px auto;"/>
-                </div>
-                <h2 style="text-align:center;margin:0px auto">Let’s Interview.</h2>
-                <div style="text-align:center;width:400px;margin:0px auto;"><p style="text-align: center;max-width:400px;">We’ll discuss ways we can make billions of dollars. Then we’ll hire a mercenary army, invade Tahiti, vanquish the French, and
-                  rule the world!</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>-->
-
-    <!-- ======= Contact Section ======= -->
-    <div id="contact" class="paddsection">
-      <div class="container">
-        <div class="contact-block1">
-          <div class="row">
-
-            <div class="col-lg-12">
-              <div class="contact-contact">
-
-                <h2 class="mb-30">GET IN TOUCH</h2>
-
-                <ul class="contact-details">
-                  <li><span>2nd Street NW</span></li>
-                  <li><span>Rochester, MN 55901</span></li>
-                  <li><span><a href="tel:17155592104">+1-715-559-2104</a></span></li>
-                  <li><span><a href="mailto:jflottmeyer@gmail.com">jflottmeyer@gmail.com</a></span></li>
-                </ul>
-
-              </div>
-            </div>
-
-            <!--<div class="col-lg-6">
-              <form action="forms/contact.php" method="post" role="form" class="php-email-form">
-                <div class="row gy-3">
-
-                  <div class="col-lg-6">
-                    <div class="form-group contact-block1">
-                      <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-12">
-                    <div class="form-group">
-                      <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-12">
-                    <div class="form-group">
-                      <textarea class="form-control" name="message" placeholder="Message" required></textarea>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-12">
-                    <div class="loading">Loading</div>
-                    <div class="error-message"></div>
-                    <div class="sent-message">Your message has been sent. Thank you!</div>
-                  </div>
-
-                  <div class="mt-0">
-                    <input type="submit" class="btn btn-defeault btn-send" value="Send message">
-                  </div>
-
-                </div>
-              </form>
-            </div>-->
-          </div>
-        </div>
-      </div>
-    </div><!-- End Contact Section -->
-
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
@@ -563,12 +445,6 @@
       <p>&copy; Copyrights Folio. All rights reserved.</p>
 
       <div class="credits">
-        <!--
-        All the links in the footer should remain intact.
-        You can delete the links only if you purchased the pro version.
-        Licensing information: https://bootstrapmade.com/license/
-        Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=Folio
-      -->
         Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
 

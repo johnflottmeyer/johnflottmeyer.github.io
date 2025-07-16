@@ -214,9 +214,11 @@
     if (portfolioContainer) {
       let portfolioIsotope = new Isotope(portfolioContainer, {
         itemSelector: '.portfolio-item',
-        layoutMode: 'fitRows'
+        /*layoutMode: 'fitRows'*/
+        layoutMode: 'masonry',
+        filter: '.filter-web'
       });
-
+      
       let portfolioFilters = select('#portfolio-flters li', true);
 
       on('click', '#portfolio-flters li', function(e) {
@@ -233,8 +235,9 @@
       }, true);
     }
 
+    
+    
   });
-
   /**
    * Initiate portfolio lightbox 
    */
