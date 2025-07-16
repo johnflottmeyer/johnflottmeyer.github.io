@@ -262,8 +262,9 @@ div, a{
   line-height: 1;
   font-weight: 600;
   letter-spacing: 1px;
-  font-family: "Playfair Display", sans-serif;
-  font-style: italic;
+  font-family: "Poppins", helvetica;
+  /*font-family: "Playfair Display", sans-serif;
+  font-style: italic;*/
 }
 #header .logo a {
   color: #898989;
@@ -462,9 +463,21 @@ div, a{
 # Hero
 --------------------------------------------------------------*/
 #hero {
-  background: url("../img/home_image.jpg") repeat scroll center center/cover;
+  background-color: #75962B;
+  background: linear-gradient(58deg,rgba(117, 150, 43, 1) 0%, rgba(117, 150, 43, 1) 52%, rgba(191, 222, 124, 1) 95%);
   height: 100vh;
+  max-height: 800px;
+  position: relative;
   width: 100%;
+}
+.my-portrait{
+  background: url(../img/home_image-me.png) right bottom / contain no-repeat scroll;
+  position: absolute;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  max-width: 50%;
+  bottom: 0;
 }
 
 #hero .hero-content {
@@ -474,6 +487,9 @@ div, a{
   display: flex;
   justify-content: center;
   flex-direction: column;
+  position: relative;
+  z-index: 100;
+    
 }
 
 .hero-content h1 {
@@ -1108,6 +1124,13 @@ blockquote {
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 @media (min-width: 768px) and (max-width: 991px) {
+  #hero {
+    height: auto;
+  }  
+  #hero .hero-content {
+    height: auto;
+    padding: 40px 0;
+  }
   /* Navbar */
   nav {
     padding: 10px 15px;
@@ -1189,6 +1212,14 @@ blockquote {
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 @media (max-width: 767px) {
+  #hero {
+    height: auto;
+  }  
+  #hero .hero-content {
+    height: auto;
+    padding: 40px 0;
+  }
+ 
   /* Navbar */
   nav {
     padding: 20px 15px;
@@ -1270,11 +1301,17 @@ blockquote {
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 @media (max-width: 600px) {
+
   /* Navbar */
   nav {
     padding: 20px 15px;
   }
-
+  .hero-content h1 {
+    font-size: 30px;
+  }
+  .my-portrait {
+    max-width: 70%;
+  }
   .nav-menu {
     margin-top: 40px;
     display: none;
