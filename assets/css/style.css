@@ -257,13 +257,15 @@ div, a{
   top: 0;
 }
 #header .logo {
-  font-size: 30px;
+  font-size: 40px;
   margin: 0;
   padding: 0;
   line-height: 1;
   font-weight: 600;
   letter-spacing: 1px;
   font-family: "Poppins", helvetica;
+
+  font-family: "Amatic SC", sans-serif;
   /*font-family: "Playfair Display", sans-serif;
   font-style: italic;*/
 }
@@ -686,6 +688,10 @@ div, a{
 #portfolio {
   position: relative;
   padding-bottom: 50px;
+}
+#portfolio h2{
+  font-family: "Amatic SC", sans-serif;
+  font-size: 40px;
 }
 #portfolio #portfolio-flters {
   padding: 0;
