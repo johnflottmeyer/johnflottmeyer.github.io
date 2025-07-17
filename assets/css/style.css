@@ -145,7 +145,7 @@ div, a{
   vertical-align: top;
 }
 .button-group{
-align-items: center;
+ align-items: center;
  display: flex;
  flex-direction: row;
  gap: 20px;
@@ -1267,6 +1267,7 @@ blockquote {
     display: inline-block;
   }
 }
+
 /** Width between 767px to 0
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
@@ -1278,7 +1279,18 @@ blockquote {
     height: auto;
     padding: 40px 0;
   }
- 
+  .hero-content h1 {
+    font-size: 50px;
+  }
+  .button-group{
+    align-items: flex-start;
+    flex-direction: column;
+    max-width: 50%;
+  }
+  .resume-button{
+   font-size: 14px;
+   min-width: 180px;
+  }
   /* Navbar */
   nav {
     padding: 20px 15px;
