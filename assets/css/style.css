@@ -1479,7 +1479,9 @@ blockquote {
   .t-resume-button {
     font-size: 12px;
   }
-  
+  .resume-button{
+    display: none;
+  }
   /* Navbar */
   nav {
     padding: 20px 15px;
