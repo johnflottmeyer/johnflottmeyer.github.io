@@ -1480,7 +1480,7 @@ blockquote {
     font-size: 12px;
   }
   .resume-button{
-    display: none;
+    display: none !important;
   }
   /* Navbar */
   nav {
