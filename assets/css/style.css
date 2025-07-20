@@ -1473,6 +1473,12 @@ blockquote {
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 @media (max-width: 480px) {
+  #header .logo {
+    font-size: 14px;
+  }
+  .t-resume-button {
+    font-size: 12px;
+  }
   /* Navbar */
   nav {
     padding: 20px 15px;
