@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sheriff Logs Map Test</title>
+</head>
+<body>
+  <h1>Sheriff Logs</h1>
+  <ul id="incidentList"></ul>
+
+  <script>
+    async function loadSheriffData() {
+      const feedUrl = "https://cors-anywhere.herokuapp.com/https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
+
+      try {
+        const response = await fetch(feedUrl);
+        const data = await response.json();
+
+        console.log("Fetched data:", data);
+
+        const list = document.getElementById("incidentList");
+        list.innerHTML = "";
+
+        data.forEach(item => {
+          const li = document.createElement("li");
+          li.innerHTML = `<b>${item.datetime}</b> — ${item.incidentType} at <a href="${item.mapLink}" target="_blank">${item.address}</a> (${item.city})`;
+          list.appendChild(li);
+        });
+
+      } catch (error) {
+        console.error("Error fetching sheriff logs:", error);
+        document.body.innerHTML += `<p style="color:red;">Error loading data. Check console for details.</p>`;
+      }
+    }
+
+    loadSheriffData();
+  </script>
+</body>
+</html>
