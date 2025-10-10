@@ -376,6 +376,11 @@ function iconForType(type) {
 
 
   function updateCharts(data){
+    if (!document.getElementById("chart1")) {
+      console.warn("Charts not ready yet.");
+      return;
+    }
+
     const typeCount = {};
     const hourCount = new Array(24).fill(0);
     const dayCount = new Array(7).fill(0);
@@ -395,9 +400,9 @@ function iconForType(type) {
       .sort((a,b) => b[1]-a[1])
       .slice(0,10);
 
-    const ctxType = document.getElementById("crimeTypeChart");
-    const ctxHour = document.getElementById("crimeHourChart");
-    const ctxDay = document.getElementById("crimeDayChart");
+    const ctxType = document.getElementById("chart1");
+    const ctxHour = document.getElementById("chart2");
+    const ctxDay = document.getElementById("chart3");
 
     if (charts.type) charts.type.destroy();
     if (charts.hour) charts.hour.destroy();
@@ -444,14 +449,28 @@ function iconForType(type) {
     });
   }
 
-  // Drawer toggle
-  const drawer = document.getElementById("chartDrawer");
+ // Drawer toggle
+  const drawer = document.getElementById("drawer"); // ✅ matches HTML id
   const toggle = document.getElementById("chartToggle");
-  toggle.addEventListener("click", () => {
-    drawer.classList.toggle("open");
-    toggle.querySelector("i").classList.toggle("fa-chart-bar");
-    toggle.querySelector("i").classList.toggle("fa-angle-left");
-  });
+  const closeBtn = document.getElementById("closeDrawer");
+
+  // open/close drawer
+  function toggleDrawer(open) {
+    if (open === undefined) drawer.classList.toggle("open");
+    else drawer.classList.toggle("open", open);
+    const icon = toggle.querySelector("i");
+    if (drawer.classList.contains("open")) {
+      icon.classList.replace("fa-chart-bar", "fa-angle-right");
+      // only render charts once drawer is visible
+      setTimeout(() => updateCharts(normData), 100);
+    } else {
+      icon.classList.replace("fa-angle-right", "fa-chart-bar");
+    }
+  }
+
+  toggle.addEventListener("click", () => toggleDrawer());
+  closeBtn.addEventListener("click", () => toggleDrawer(false));
+
 
   // Map style toggle (cycles between Street → Dark → Satellite)
   const mapToggle = document.getElementById("mapToggle");
