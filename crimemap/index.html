@@ -17,6 +17,9 @@
 
   <style>
     body { margin:0; font-family: Arial, sans-serif; }
+    .logo{
+      margin: 0 30px 0 10px;
+    }
     #controls {
       padding:10px;
       display:flex;
@@ -115,7 +118,7 @@
 
     @media (prefers-color-scheme: dark) {
       #controls, #disclaimer, .legend {
-        background: rgba(30, 30, 30, 0.95);
+        background: #401201;
         color: #f1f1f1;
       }
       .info {
@@ -127,6 +130,7 @@
 <body>
 
 <div id="controls">
+  <h1 class="logo">Olmsted Incident Report</h1>
   <label>From: <input type="date" id="startDate"></label>
   <label>To: <input type="date" id="endDate"></label>
 
@@ -181,7 +185,8 @@
   let normData = [];
   let charts = {};
 
-  const PALETTE = ["#D7D7D9","#638C45","#D9C0A3","#A66B38","#401201"];
+  //const PALETTE = ["#D7D7D9","#638C45","#D9C0A3","#A66B38","#401201"];
+  const PALETTE = ["#638C45"];
   const ICONS = {
     "accident": "fa-car-burst",
     "accident injury": "fa-ambulance",
