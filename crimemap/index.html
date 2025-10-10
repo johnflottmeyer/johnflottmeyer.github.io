@@ -13,11 +13,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik+Glitch&display=swap" rel="stylesheet">
   <style>
     .roboto-<uniquifier> {
       font-family: "Roboto", sans-serif;
@@ -27,8 +25,15 @@
       font-variation-settings:
         "wdth" 100;
     }
-    body { margin:0; font-family: Roboto, Arial, sans-serif; }
+    .rubik-glitch-regular {
+      font-family: "Rubik Glitch", system-ui;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    body { margin:0; font-family: "Roboto", Arial, sans-serif; }
     .logo{
+      font-family: "Rubik Glitch", Arial, sans-serif;
       margin: 0 30px 0 10px;
     }
     #controls {
@@ -128,9 +133,15 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      #controls, #disclaimer, .legend {
-        background: #401201;
+      #controls {
+        background-color: #A66B38;
         color: #f1f1f1;
+      }
+      .legend{
+        background-color: #638C45;
+      }
+      #disclaimer{
+         background-color: #A66B38;
       }
       .info {
         color: #929292;
@@ -197,7 +208,7 @@
   let charts = {};
 
   //const PALETTE = ["#D7D7D9","#638C45","#D9C0A3","#A66B38","#401201"];
-  const PALETTE = ["#638C45"];
+  const PALETTE = ["#401201"];
   const ICONS = {
     "accident": "fa-car-burst",
     "accident injury": "fa-ambulance",
