@@ -2,18 +2,14 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Crime Map with Font Awesome Markers</title>
+  <title>Crime Map with Font Awesome 6 Markers</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Leaflet.awesome-markers CSS & JS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.5/leaflet.awesome-markers.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.5/leaflet.awesome-markers.js"></script>
-
-  <!-- Font Awesome -->
+  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
@@ -22,6 +18,7 @@
     #map { height: calc(100vh - 72px); width:100%; }
     select,input[type="date"],button { padding:6px 8px; border-radius:6px; border:1px solid #ccc; }
     .info { font-size:13px; color:#555; margin-left:8px;}
+    .fa-icon { font-size: 24px; color: red; }
   </style>
 </head>
 <body>
@@ -121,13 +118,21 @@
 
   function iconForType(type){
     const t = (type||'').toLowerCase();
-    if(t.includes('traffic')) return {icon:'car', markerColor:'blue'};
-    if(t.includes('burglary')) return {icon:'person-bolt', markerColor:'red'};
-    if(t.includes('theft')) return {icon:'hand-holding', markerColor:'orange'};
-    if(t.includes('drugs')) return {icon:'prescription-bottle', markerColor:'purple'};
-    if(t.includes('assist')) return {icon:'hands-helping', markerColor:'green'};
-    if(t.includes('crisis')) return {icon:'exclamation-triangle', markerColor:'yellow'};
-    return {icon:'map-marker-alt', markerColor:'cadetblue'};
+    let iconClass = "fa-map-marker-alt";
+    let color = "red";
+    if(t.includes("traffic")) { iconClass = "fa-car"; color = "blue"; }
+    if(t.includes("burglary")) { iconClass = "fa-user-secret"; color = "orange"; }
+    if(t.includes("theft")) { iconClass = "fa-hand-paper"; color = "purple"; }
+    if(t.includes("drugs")) { iconClass = "fa-prescription-bottle-medical"; color = "green"; }
+    if(t.includes("assist")) { iconClass = "fa-hands-helping"; color = "cadetblue"; }
+    if(t.includes("crisis")) { iconClass = "fa-triangle-exclamation"; color = "yellow"; }
+
+    return L.divIcon({
+      html: `<i class="fa ${iconClass} fa-icon" style="color:${color}"></i>`,
+      className: "",
+      iconSize: [24, 24],
+      iconAnchor: [12, 24]
+    });
   }
 
   function renderMarkers(data){
@@ -135,14 +140,9 @@
     let count = 0;
     data.forEach(d=>{
       if(d.lat == null || d.lng == null) return;
-      const iconData = iconForType(d.type);
-      const marker = L.AwesomeMarkers.icon({
-        icon: iconData.icon,
-        prefix: 'fa',
-        markerColor: iconData.markerColor,
-        spin: false
-      });
-      L.marker([d.lat,d.lng], {icon:marker}).bindPopup(popupHtml(d)).addTo(markersLayer);
+      const marker = L.marker([d.lat,d.lng], {icon:iconForType(d.type)})
+        .bindPopup(popupHtml(d));
+      markersLayer.addLayer(marker);
       count++;
     });
     document.getElementById('status').textContent = `Showing ${count} of ${normData.length} records`;
@@ -174,7 +174,6 @@
   });
 
   await loadData();
-
 })();
 </script>
 </body>
