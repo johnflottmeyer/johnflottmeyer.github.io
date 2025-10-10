@@ -2,12 +2,15 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Crime Map with Legend & Disclaimer</title>
+  <title>Crime Map with Legend & Charts</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -22,6 +25,8 @@
       align-items:center;
       background:#f6f7f8;
       border-bottom:1px solid #ccc;
+      z-index: 1001;
+      position: relative;
     }
     #controls label { font-size: 14px; }
     #controls select,input[type="date"],button {
@@ -30,7 +35,7 @@
       border:1px solid #ccc;
       font-size:14px;
     }
-    #map { height: calc(100vh - 100px); width:100%; }
+    #map { height: calc(100vh - 100px); width:100%; position:relative; }
     .info { font-size:13px; color:#555; }
     .fa-icon { font-size: 20px; }
     .legend {
@@ -54,6 +59,49 @@
       color: #333;
       z-index: 1000;
     }
+
+    /* Chart drawer styles */
+    #chartDrawer {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      bottom: 60px;
+      width: 320px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      padding: 10px;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1200;
+    }
+    #chartDrawer.open {
+      transform: translateX(0);
+    }
+    #chartToggle {
+      position: fixed;
+      top: 80px;
+      left: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 1300;
+    }
+    #chartDrawer canvas {
+      max-width: 100%;
+      margin: 15px 0;
+    }
+    #chartDrawer h4 {
+      margin: 10px 0 5px;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
@@ -74,6 +122,21 @@
 
 <div id="map"></div>
 
+<div id="chartToggle" title="Toggle Charts">
+  <i class="fa fa-chart-bar"></i>
+</div>
+
+<div id="chartDrawer">
+  <h4>Most Common Incident Types</h4>
+  <canvas id="crimeTypeChart"></canvas>
+
+  <h4>Incidents by Hour</h4>
+  <canvas id="crimeHourChart"></canvas>
+
+  <h4>Incidents by Day</h4>
+  <canvas id="crimeDayChart"></canvas>
+</div>
+
 <div id="disclaimer">
   ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
 </div>
@@ -84,7 +147,7 @@
   const CENTER = [44.0221, -92.4630];
   const ZOOM = 11;
 
-  let map = L.map('map').setView(CENTER, ZOOM);
+  const map = L.map('map').setView(CENTER, ZOOM);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
@@ -92,6 +155,7 @@
   let markersLayer = L.layerGroup().addTo(map);
   let rawData = [];
   let normData = [];
+  let charts = {};
 
   function pick(o, keys){
     for(const k of keys){
@@ -124,16 +188,18 @@
     try {
       const res = await fetch(DATA_URL);
       if(!res.ok) throw new Error('Fetch failed: ' + res.status);
-      rawData = await res.json();
-      if (rawData && rawData.records) rawData = rawData.records;
-      if (!Array.isArray(rawData)) { console.error('Bad feed:', rawData); return; }
+      let data = await res.json();
+      rawData = Array.isArray(data) ? data : (data.records || []);
+      if (!Array.isArray(rawData)) throw new Error('Unexpected data format');
+
       normData = rawData.map(normalize);
       populateTypes();
       renderMarkers(normData);
       addLegend(map);
+      updateCharts(normData);
       document.getElementById('status').textContent = `Loaded ${normData.length} records`;
     } catch (err) {
-      console.error(err);
+      console.error('Error loading data:', err);
       document.getElementById('status').textContent = 'Error loading feed';
     }
   }
@@ -176,13 +242,16 @@
   function renderMarkers(data){
     markersLayer.clearLayers();
     let count = 0;
+    const bounds = L.latLngBounds();
     data.forEach(d=>{
       if(d.lat == null || d.lng == null) return;
       const marker = L.marker([d.lat,d.lng], {icon:iconForType(d.type)})
         .bindPopup(popupHtml(d));
       markersLayer.addLayer(marker);
+      bounds.extend([d.lat, d.lng]);
       count++;
     });
+    if (count > 0) map.fitBounds(bounds);
     document.getElementById('status').textContent = `Showing ${count} of ${normData.length} records`;
   }
 
@@ -201,6 +270,7 @@
       return true;
     });
     renderMarkers(filtered);
+    updateCharts(filtered);
   }
 
   function addLegend(map) {
@@ -225,12 +295,91 @@
     legend.addTo(map);
   }
 
+  function updateCharts(data){
+    const typeCount = {};
+    const hourCount = new Array(24).fill(0);
+    const dayCount = new Array(7).fill(0);
+    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    data.forEach(c => {
+      const type = c.type || "Unknown";
+      typeCount[type] = (typeCount[type] || 0) + 1;
+      const d = new Date(c.date);
+      if (!isNaN(d)) {
+        hourCount[d.getHours()]++;
+        dayCount[d.getDay()]++;
+      }
+    });
+
+    const topTypes = Object.entries(typeCount)
+      .sort((a,b) => b[1]-a[1])
+      .slice(0,10);
+
+    const ctxType = document.getElementById("crimeTypeChart");
+    const ctxHour = document.getElementById("crimeHourChart");
+    const ctxDay = document.getElementById("crimeDayChart");
+
+    if (charts.type) charts.type.destroy();
+    if (charts.hour) charts.hour.destroy();
+    if (charts.day) charts.day.destroy();
+
+    charts.type = new Chart(ctxType, {
+      type: "bar",
+      data: {
+        labels: topTypes.map(t => t[0]),
+        datasets: [{
+          label: "Incidents",
+          data: topTypes.map(t => t[1]),
+          backgroundColor: "#dc3545"
+        }]
+      },
+      options: { plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}}}
+    });
+
+    charts.hour = new Chart(ctxHour, {
+      type: "line",
+      data: {
+        labels: [...Array(24).keys()],
+        datasets: [{
+          label: "Incidents by Hour",
+          data: hourCount,
+          borderColor: "#007bff",
+          tension: 0.3
+        }]
+      },
+      options: { plugins:{legend:{display:false}}}
+    });
+
+    charts.day = new Chart(ctxDay, {
+      type: "bar",
+      data: {
+        labels: days,
+        datasets: [{
+          label: "Incidents by Day",
+          data: dayCount,
+          backgroundColor: "#198754"
+        }]
+      },
+      options: { plugins:{legend:{display:false}}}
+    });
+  }
+
+  // Drawer toggle
+  const drawer = document.getElementById("chartDrawer");
+  const toggle = document.getElementById("chartToggle");
+  toggle.addEventListener("click", () => {
+    drawer.classList.toggle("open");
+    toggle.querySelector("i").classList.toggle("fa-chart-bar");
+    toggle.querySelector("i").classList.toggle("fa-angle-left");
+  });
+
   document.getElementById('filterBtn').addEventListener('click', applyFilters);
   document.getElementById('resetBtn').addEventListener('click', ()=>{
     document.getElementById('startDate').value='';
     document.getElementById('endDate').value='';
     document.getElementById('crimeType').value='';
     renderMarkers(normData);
+    updateCharts(normData);
   });
 
   await loadData();
