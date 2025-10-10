@@ -60,18 +60,18 @@
       z-index: 1000;
     }
 
-    /* Chart drawer styles */
+    /* Chart drawer styles on right */
     #chartDrawer {
       position: fixed;
       top: 60px;
-      left: 0;
+      right: 0;
       bottom: 60px;
-      width: 320px;
+      width: 350px;
       background: rgba(255, 255, 255, 0.98);
-      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      box-shadow: -2px 0 8px rgba(0,0,0,0.3);
       padding: 10px;
       overflow-y: auto;
-      transform: translateX(-100%);
+      transform: translateX(100%);
       transition: transform 0.3s ease;
       z-index: 1200;
     }
@@ -81,16 +81,16 @@
     #chartToggle {
       position: fixed;
       top: 80px;
-      left: 10px;
+      right: 0;
       background: #fff;
       border: 1px solid #ccc;
-      border-radius: 50%;
+      border-radius: 4px 0 0 4px;
       width: 36px;
       height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
       cursor: pointer;
       z-index: 1300;
     }
@@ -116,6 +116,14 @@
 
   <button id="filterBtn">Apply</button>
   <button id="resetBtn">Reset</button>
+
+  <label>Map Style:
+    <select id="mapStyle">
+      <option value="street">Street</option>
+      <option value="dark">Dark</option>
+      <option value="satellite">Satellite</option>
+    </select>
+  </label>
 
   <span class="info" id="status">Loading…</span>
 </div>
@@ -147,10 +155,11 @@
   const CENTER = [44.0221, -92.4630];
   const ZOOM = 11;
 
-  const map = L.map('map').setView(CENTER, ZOOM);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+  const streetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' });
+  const darkTiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_dark/{z}/{x}/{y}{r}.png', { attribution:'© Stadia Maps' });
+  const satelliteTiles = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap' });
+
+  const map = L.map('map', { layers: [streetTiles] }).setView(CENTER, ZOOM);
 
   let markersLayer = L.layerGroup().addTo(map);
   let rawData = [];
@@ -371,6 +380,15 @@
     drawer.classList.toggle("open");
     toggle.querySelector("i").classList.toggle("fa-chart-bar");
     toggle.querySelector("i").classList.toggle("fa-angle-left");
+  });
+
+  // Map style toggle
+  document.getElementById("mapStyle").addEventListener("change", function(){
+    map.eachLayer(layer => map.removeLayer(layer));
+    if(this.value === "street") streetTiles.addTo(map);
+    if(this.value === "dark") darkTiles.addTo(map);
+    if(this.value === "satellite") satelliteTiles.addTo(map);
+    markersLayer.addTo(map);
   });
 
   document.getElementById('filterBtn').addEventListener('click', applyFilters);
