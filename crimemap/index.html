@@ -67,57 +67,53 @@
     }
 
     /* Chart drawer styles on right */
-    #chartDrawer {
-      position: fixed;
-      top: 60px;
+    .drawer {
+      position: absolute;
+      top: 0;
       right: 0;
-      bottom: 60px;
       width: 350px;
-      /*background: rgba(255, 255, 255, 0.5);*/
+      height: 100%;
+      /*background: rgba(255, 255, 255, 0.5);*/ 
       backdrop-filter: blur(10px);
-      box-shadow: -2px 0 8px rgba(0,0,0,0.3);
-      padding: 10px;
-      overflow-y: auto;
+      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
       transform: translateX(100%);
       transition: transform 0.3s ease;
-      z-index: 1200;
+      overflow-y: auto;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
     }
-    #chartDrawer.open {
+
+    .drawer.open {
       transform: translateX(0);
     }
-    #chartToggle {
-      position: fixed;
-      top: 80px;
-      right: 0;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 4px 0 0 4px;
-      width: 36px;
-      height: 36px;
+
+    .drawer-header {
+      padding: 10px 16px;
+      background: #f7f7f7;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
-      cursor: pointer;
-      z-index: 1300;
     }
-    #chartDrawer canvas {
-      max-width: 100%;
-      margin: 15px 0;
+
+    .drawer-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
     }
-    #chartDrawer h4 {
-      margin: 10px 0 5px;
-      font-size: 15px;
-    }
-    /* Or apply it via media query */
+
+    /* Optional: darker mode adjustment */
     @media (prefers-color-scheme: dark) {
-      #controls, #disclaimer, #chartToggle {
-        background-color: #333;
-        color:#f6f7f8;
+      .drawer {
+        background: rgba(30, 30, 30, 0.95);
+        color: #f1f1f1;
       }
-      /*#chartDrawer {
-        background: rgba(100, 100, 100, 0.5);
-      }*/
+      .drawer-header {
+        background: #222;
+        border-bottom-color: #444;
+      }
     }
   </style>
 </head>
@@ -145,16 +141,18 @@
   <i class="fa fa-chart-bar"></i>
 </div>
 
-<div id="chartDrawer">
-  <h4>Most Common Incident Types</h4>
-  <canvas id="crimeTypeChart"></canvas>
-
-  <h4>Incidents by Hour</h4>
-  <canvas id="crimeHourChart"></canvas>
-
-  <h4>Incidents by Day</h4>
-  <canvas id="crimeDayChart"></canvas>
+<div id="drawer" class="drawer">
+  <div class="drawer-header">
+    <span>Crime Charts</span>
+    <button id="closeDrawer">✕</button>
+  </div>
+  <div class="drawer-content">
+    <canvas id="chart1"></canvas>
+    <canvas id="chart2"></canvas>
+    <canvas id="chart3"></canvas>
+  </div>
 </div>
+
 
 <div id="disclaimer">
   ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
@@ -322,26 +320,60 @@ function iconForType(type) {
   }
 
   function addLegend(map) {
-    const legend = L.control({position: 'bottomright'});
-    legend.onAdd = function () {
-        const div = L.DomUtil.create('div', 'legend');
-        div.innerHTML += "<strong>Crime Types</strong><br/>";
-        const types = [
-            {label: "Traffic", icon: "fa-car", color: "blue"},
-            {label: "Burglary", icon: "fa-user-secret", color: "orange"},
-            {label: "Theft", icon: "fa-hand-paper", color: "purple"},
-            {label: "Drugs", icon: "fa-prescription-bottle-medical", color: "green"},
-            {label: "Assist", icon: "fa-hands-helping", color: "cadetblue"},
-            {label: "Crisis", icon: "fa-triangle-exclamation", color: "yellow"},
-            {label: "Other", icon: "fa-map-marker-alt", color: "red"}
-        ];
-        types.forEach(type => {
-            div.innerHTML += `<i class="fa ${type.icon}" style="color:${type.color}"></i> ${type.label}<br/>`;
-        });
-        return div;
+  const legend = L.control({ position: "bottomleft" });
+
+  legend.onAdd = function () {
+    const div = L.DomUtil.create("div", "legend");
+    div.innerHTML = `<h4>Incident Types</h4>`;
+
+    const icons = {
+      "Accident": ["fa-car-burst", "#dc3545"],
+      "Accident Injury": ["fa-ambulance", "#c82333"],
+      "Alarm": ["fa-bell", "#ffc107"],
+      "Animal": ["fa-paw", "#795548"],
+      "App Order": ["fa-mobile-screen", "#6c757d"],
+      "Assist": ["fa-hands-helping", "#17a2b8"],
+      "Assist FD": ["fa-fire-extinguisher", "#fd7e14"],
+      "Community Service": ["fa-people-group", "#20c997"],
+      "Damage to Property": ["fa-house-crack", "#6610f2"],
+      "Death Investigation": ["fa-cross", "#212529"],
+      "Drugs - Paraphernalia": ["fa-capsules", "#28a745"],
+      "Escape": ["fa-person-running", "#e83e8c"],
+      "Escort": ["fa-shield-halved", "#007bff"],
+      "Medical": ["fa-stethoscope", "#0dcaf0"],
+      "New Call": ["fa-bolt", "#6610f2"],
+      "Paper Service": ["fa-file-signature", "#6f42c1"],
+      "Parking Violation": ["fa-square-parking", "#adb5bd"],
+      "Person in Crisis": ["fa-triangle-exclamation", "#ff851b"],
+      "Probation Check": ["fa-id-card", "#17a2b8"],
+      "Project Lifesaver": ["fa-satellite-dish", "#6610f2"],
+      "Suspicious Circumstance": ["fa-eye", "#ffc107"],
+      "Traffic Assist - Complaint": ["fa-road", "#007bff"],
+      "Traffic Enforcement": ["fa-gauge-high", "#0d6efd"],
+      "Traffic Stop": ["fa-stop", "#dc3545"],
+      "Warrant": ["fa-gavel", "#343a40"]
     };
-    legend.addTo(map);
-  }
+
+    Object.entries(icons).forEach(([label, [icon, color]]) => {
+      div.innerHTML += `
+        <div class="legend-item">
+          <i class="fa ${icon}" style="color:${color}"></i>
+          <span>${label}</span>
+        </div>`;
+    });
+
+    div.innerHTML += `
+      <div class="legend-item">
+        <i class="fa fa-map-marker-alt" style="color:#6c757d"></i>
+        <span>Other / Unknown</span>
+      </div>`;
+
+    return div;
+  };
+
+  legend.addTo(map);
+}
+
 
   function updateCharts(data){
     const typeCount = {};
