@@ -91,7 +91,7 @@
 
   <script>
     const map = L.map('map').setView([39.7392, -104.9903], 12);
-    
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
@@ -104,13 +104,15 @@
           'https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec'
         );
         const data = await response.json();
-        allCrimes = data.records || [];
+        allCrimes = Array.isArray(data) ? data : (data.records || []);
+        console.log('Loaded crimes:', allCrimes.length);
         plotCrimes(allCrimes);
         updateCharts(allCrimes);
       } catch (err) {
         console.error('Error loading data', err);
       }
     }
+
 
     function plotCrimes(data) {
       data.forEach(crime => {
