@@ -37,7 +37,12 @@
     }
     #map { height: calc(100vh - 100px); width:100%; position:relative; }
     .info { font-size:13px; color:#555; }
-    .fa-icon { font-size: 20px; }
+    .fa-icon { 
+      font-size: 20px; 
+      background-color: rgba(255,255,255,0.8)
+      padding: 5px;
+      border-radius: 60%;
+    }
     .legend {
       background:white;
       padding:8px;
@@ -101,6 +106,13 @@
     #chartDrawer h4 {
       margin: 10px 0 5px;
       font-size: 15px;
+    }
+    /* Or apply it via media query */
+    @media (prefers-color-scheme: dark) {
+      #controls {
+        background-color: #333;
+        color:#f6f7f8;
+      }
     }
   </style>
 </head>
