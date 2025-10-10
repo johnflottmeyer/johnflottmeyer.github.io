@@ -2,36 +2,63 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Crime Map with Font Awesome 6 Markers & Legend</title>
+  <title>Crime Map with Legend & Disclaimer</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Font Awesome 6 -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
+  <!--Charts-->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    body { margin:0; font-family:system-ui; }
-    #controls { padding:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; background:#f6f7f8; border-bottom:1px solid #ddd;}
-    #map { height: calc(100vh - 72px); width:100%; }
-    select,input[type="date"],button { padding:6px 8px; border-radius:6px; border:1px solid #ccc; }
-    .info { font-size:13px; color:#555; margin-left:8px;}
-    .fa-icon { font-size: 24px; }
-    .legend i { margin-right: 6px; }
+    body { margin:0; font-family: Arial, sans-serif; }
+    #controls {
+      padding:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      background:#f6f7f8;
+      border-bottom:1px solid #ccc;
+    }
+    #controls label { font-size: 14px; }
+    #controls select,input[type="date"],button {
+      padding:5px 8px;
+      border-radius:4px;
+      border:1px solid #ccc;
+      font-size:14px;
+    }
+    #map { height: calc(100vh - 100px); width:100%; }
+    .info { font-size:13px; color:#555; }
+    .fa-icon { font-size: 20px; }
+    .legend {
+      background:white;
+      padding:8px;
+      border-radius:6px;
+      box-shadow:0 0 15px rgba(0,0,0,0.2);
+      font-size:14px;
+    }
+    .legend i { margin-right:6px; }
     #disclaimer {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.95);
       padding: 8px 12px;
       font-size: 13px;
       text-align: center;
       border-top: 1px solid #ccc;
       color: #333;
       z-index: 1000;
+    }
+    #crimeChart {
+        margin: 10px;
     }
 
   </style>
@@ -43,9 +70,7 @@
   <label>To: <input type="date" id="endDate"></label>
 
   <label>Type:
-    <select id="crimeType">
-      <option value="">All</option>
-    </select>
+    <select id="crimeType"><option value="">All</option></select>
   </label>
 
   <button id="filterBtn">Apply</button>
@@ -53,8 +78,13 @@
 
   <span class="info" id="status">Loading…</span>
 </div>
+<canvas id="crimeChart" style="height:200px; width:100%;"></canvas>
 
 <div id="map"></div>
+
+<div id="disclaimer">
+  ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
+</div>
 
 <script>
 (async function(){
@@ -86,7 +116,7 @@
     const lng = parseFloat(pick(raw, ['long','lng','lon','Longitude']));
     return {
       raw,
-      date,
+      date,frender
       dateRaw: dateStr || "",
       lat: (!isNaN(lat) ? lat : null),
       lng: (!isNaN(lng) ? lng : null),
@@ -96,7 +126,6 @@
       zip: pick(raw, ['zip','Zip','postal','Postal'])
     };
   }
-
   async function loadData(){
     document.getElementById('status').textContent = 'Loading data…';
     try {
@@ -108,12 +137,53 @@
       normData = rawData.map(normalize);
       populateTypes();
       renderMarkers(normData);
+      buildChart(data);
       addLegend(map);
       document.getElementById('status').textContent = `Loaded ${normData.length} records`;
     } catch (err) {
       console.error(err);
       document.getElementById('status').textContent = 'Error loading feed';
     }
+  }
+  let crimeChart;
+
+  function buildChart(data) {
+      const typeCounts = {};
+      data.forEach(d=>{
+          if(d.type) {
+              typeCounts[d.type] = (typeCounts[d.type] || 0) + 1;
+          }
+      });
+
+      const labels = Object.keys(typeCounts).sort((a,b)=>typeCounts[b]-typeCounts[a]);
+      const counts = labels.map(l=>typeCounts[l]);
+
+      const ctx = document.getElementById('crimeChart').getContext('2d');
+      if(crimeChart) crimeChart.destroy();
+
+      crimeChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Number of Incidents',
+                  data: counts,
+                  backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: { display: false },
+                  title: { display: true, text: 'Incidents by Type' }
+              },
+              scales: {
+                  y: { beginAtZero: true }
+              }
+          }
+      });
   }
 
   function populateTypes(){
@@ -184,13 +254,8 @@
   function addLegend(map) {
     const legend = L.control({position: 'bottomright'});
     legend.onAdd = function () {
-        const div = L.DomUtil.create('div', 'info legend');
-        div.style.background = "white";
-        div.style.padding = "8px";
-        div.style.borderRadius = "6px";
-        div.style.boxShadow = "0 0 15px rgba(0,0,0,0.2)";
+        const div = L.DomUtil.create('div', 'legend');
         div.innerHTML += "<strong>Crime Types</strong><br/>";
-
         const types = [
             {label: "Traffic", icon: "fa-car", color: "blue"},
             {label: "Burglary", icon: "fa-user-secret", color: "orange"},
@@ -200,12 +265,9 @@
             {label: "Crisis", icon: "fa-triangle-exclamation", color: "yellow"},
             {label: "Other", icon: "fa-map-marker-alt", color: "red"}
         ];
-
         types.forEach(type => {
-            div.innerHTML +=
-                `<i class="fa ${type.icon}" style="color:${type.color}; font-size:18px;"></i> ${type.label}<br/>`;
+            div.innerHTML += `<i class="fa ${type.icon}" style="color:${type.color}"></i> ${type.label}<br/>`;
         });
-
         return div;
     };
     legend.addTo(map);
@@ -222,8 +284,5 @@
   await loadData();
 })();
 </script>
-<div id="disclaimer">
-  ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
-</div>
 </body>
 </html>
