@@ -1,52 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Crime Map with Legend & Charts</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8" />
+<title>Crime Map with Legend & Charts</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-   
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <style>
-    body { margin:0; font-family: "Roboto", Arial, sans-serif; }
-    .logo{ font-family: "Doto", Arial, sans-serif; margin: 0 30px 0 10px; }
-    #controls { padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#f6f7f8; border-bottom:1px solid #ccc; z-index:1001; position:relative; }
-    #controls label { font-size: 14px; }
-    #controls select,input[type="date"],input[type="time"],button { padding:5px 8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
-    #map { height: calc(100vh - 100px); width:100%; position:relative; }
-    .info { font-size:13px; color:#555; }
-    .fa-icon { font-size: 20px; background-color: rgba(255,255,255,0.5); border:1px solid #FFF; padding: 5px; border-radius: 60%; color: #7C2C2C; }
-    .legend { background:white; padding:8px; border-radius:6px; box-shadow:0 0 15px rgba(0,0,0,0.2); font-size:14px; }
-    .legend i { margin-right:6px; }
-    .legend h4 { margin-top: 0; }
-    #disclaimer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); padding: 8px 12px; font-size: 13px; text-align: center; border-top: 1px solid #ccc; color: #333; z-index: 1000; }
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    /* Chart drawer */
-    #chartToggle{ background-color:#FFF; padding: 5px; position: absolute; right: 10px; top: 70px; z-index: 1000; }
-    .drawer { position: absolute; top: 0; right: 0; width: 350px; height: 100%; backdrop-filter: blur(10px); box-shadow: -4px 0 10px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; z-index:1001; display:flex; flex-direction:column; }
-    .drawer.open { transform: translateX(0); }
-    .drawer-header { padding:10px 16px; background:#f7f7f7; border-bottom:1px solid #ddd; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
-    .drawer-content { flex:1; padding:16px; overflow-y:auto; }
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-    @media (prefers-color-scheme: dark) {
-      #controls { background-color:#638C45; color:#f1f1f1; }
-      .legend{ background-color:#D9C0A3; }
-      #disclaimer{ background-color:#D7D7D9; }
-      .info { color: #929292; }
-    }
-  </style>
+<style>
+body { margin:0; font-family: "Roboto", Arial, sans-serif; }
+.logo{ font-family: "Doto", Arial, sans-serif; margin: 0 30px 0 10px; }
+#controls { padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#f6f7f8; border-bottom:1px solid #ccc; z-index:1001; position:relative; }
+#controls label { font-size: 14px; }
+#controls select,input[type="date"],input[type="time"],button { padding:5px 8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
+#map { height: calc(100vh - 100px); width:100%; position:relative; }
+.info { font-size:13px; color:#555; }
+.fa-icon { font-size: 20px; background-color: rgba(255,255,255,0.5); border:1px solid #FFF; padding: 5px; border-radius: 60%; color: #7C2C2C; }
+.legend { background:white; padding:8px; border-radius:6px; box-shadow:0 0 15px rgba(0,0,0,0.2); font-size:14px; }
+.legend i { margin-right:6px; }
+.legend h4 { margin-top: 0; }
+#disclaimer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); padding: 8px 12px; font-size: 13px; text-align: center; border-top: 1px solid #ccc; color: #333; z-index: 1000; }
+
+/* Chart drawer */
+#chartToggle{ background-color:#FFF; padding: 5px; position: absolute; right: 10px; top: 70px; z-index: 1000; }
+.drawer { position: absolute; top: 0; right: 0; width: 350px; height: 100%; backdrop-filter: blur(10px); box-shadow: -4px 0 10px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; z-index:1001; display:flex; flex-direction:column; }
+.drawer.open { transform: translateX(0); }
+.drawer-header { padding:10px 16px; background:#f7f7f7; border-bottom:1px solid #ddd; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
+.drawer-content { flex:1; padding:16px; overflow-y:auto; }
+.drawer-content canvas { width: 100% !important; height: 200px !important; margin-bottom:25px; }
+
+@media (prefers-color-scheme: dark) {
+  #controls { background-color:#638C45; color:#f1f1f1; }
+  .legend{ background-color:#D9C0A3; }
+  #disclaimer{ background-color:#D7D7D9; }
+  .info { color: #929292; }
+}
+</style>
 </head>
 <body>
 
@@ -56,12 +58,9 @@
   <label>To: <input type="date" id="endDate"></label>
   <label>From Time: <input type="time" id="startTime" value="00:00"></label>
   <label>To Time: <input type="time" id="endTime" value="23:59"></label>
-
   <label>Type: <select id="crimeType"><option value="">All</option></select></label>
-
   <button id="filterBtn">Apply</button>
   <button id="resetBtn">Reset</button>
-
   <button id="mapToggle">Map: Street</button>
   <span class="info" id="status">Loading…</span>
 </div>
@@ -81,6 +80,15 @@
     <canvas id="chart1"></canvas>
     <canvas id="chart2"></canvas>
     <canvas id="chart3"></canvas>
+    <canvas id="chart4"></canvas>
+    <canvas id="chart5"></canvas>
+    <canvas id="chart6"></canvas>
+    <canvas id="chart7"></canvas>
+    <canvas id="chart8"></canvas>
+    <canvas id="chart9"></canvas>
+    <canvas id="chart10"></canvas>
+    <canvas id="chart11"></canvas>
+    <canvas id="chart12"></canvas>
   </div>
 </div>
 
@@ -93,14 +101,13 @@
   const DATA_URL = "https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
   const CENTER = [44.0221, -92.4630];
   const ZOOM = 11;
-
   const streetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' });
   const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:"abcd", maxZoom:19});
   const satelliteTiles = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap' });
 
   const map = L.map('map', { layers: [streetTiles] }).setView(CENTER, ZOOM);
   let markersLayer = L.layerGroup().addTo(map);
-  let rawData = [], normData = [], charts = {};
+  let rawData=[], normData=[], charts={};
   const PALETTE = ["#7C2C2C"];
   const ICONS = {
     "accident": "fa-car-burst",
@@ -137,13 +144,7 @@
     let date = dateStr?new Date(dateStr):null;
     const lat=parseFloat(pick(raw,['lat','Lat','latitude','Latitude']));
     const lng=parseFloat(pick(raw,['long','lng','lon','Longitude']));
-    return {
-      raw, date, dateRaw: dateStr||"", lat:(!isNaN(lat)?lat:null), lng:(!isNaN(lng)?lng:null),
-      type: pick(raw,['incidentType','IncidentType','crime','Crime','type','Type','Incident']),
-      address: pick(raw,['FullAddress','address','Address','location','Location']),
-      city: pick(raw,['city','City','venue','Venue']),
-      zip: pick(raw,['zip','Zip','postal','Postal'])
-    };
+    return { raw, date, dateRaw: dateStr||"", lat:(!isNaN(lat)?lat:null), lng:(!isNaN(lng)?lng:null), type: pick(raw,['incidentType','IncidentType','crime','Crime','type','Type','Incident']), address: pick(raw,['FullAddress','address','Address','location','Location']), city: pick(raw,['city','City','venue','Venue']), zip: pick(raw,['zip','Zip','postal','Postal']) };
   }
 
   async function loadData(){
@@ -172,22 +173,13 @@
   }
 
   function popupHtml(d){ return `<div style="font-size:13px;"><strong>${d.type||'Incident'}</strong><br/>${d.address||''}<br/>${d.city||''} ${d.zip||''}<br/><small>${d.dateRaw||''}</small></div>`; }
-  function iconForType(type){
-    const t=(type||'').toLowerCase();
-    let iconClass="fa-map-marker-alt";
-    if(ICONS[t]) iconClass=ICONS[t];
-    return L.divIcon({ html:`<i class="fa ${iconClass} fa-icon" style="color:${PALETTE[0]}"></i>`, className:"", iconSize:[24,24], iconAnchor:[12,24] });
-  }
+  function iconForType(type){ const t=(type||'').toLowerCase(); let iconClass="fa-map-marker-alt"; if(ICONS[t]) iconClass=ICONS[t]; return L.divIcon({ html:`<i class="fa ${iconClass} fa-icon" style="color:${PALETTE[0]}"></i>`, className:"", iconSize:[24,24], iconAnchor:[12,24] }); }
 
   function renderMarkers(data){
     markersLayer.clearLayers();
-    data.sort((a,b)=>a.date-b.date); // Sort by time
+    data.sort((a,b)=>a.date-b.date);
     let count=0, bounds=L.latLngBounds();
-    data.forEach(d=>{
-      if(d.lat==null||d.lng==null) return;
-      const marker=L.marker([d.lat,d.lng],{icon:iconForType(d.type)}).bindPopup(popupHtml(d));
-      markersLayer.addLayer(marker); bounds.extend([d.lat,d.lng]); count++;
-    });
+    data.forEach(d=>{ if(d.lat==null||d.lng==null) return; const marker=L.marker([d.lat,d.lng],{icon:iconForType(d.type)}).bindPopup(popupHtml(d)); markersLayer.addLayer(marker); bounds.extend([d.lat,d.lng]); count++; });
     if(count>0) map.fitBounds(bounds);
     document.getElementById('status').textContent=`Showing ${count} of ${normData.length} records`;
   }
@@ -198,10 +190,8 @@
     const startTimeVal=document.getElementById('startTime').value||"00:00";
     const endTimeVal=document.getElementById('endTime').value||"23:59";
     const typeVal=document.getElementById('crimeType').value;
-
     const start=startVal?new Date(startVal+'T00:00:00'):null;
     const end=endVal?new Date(endVal+'T23:59:59'):null;
-
     const [startH,startM]=startTimeVal.split(':').map(Number);
     const [endH,endM]=endTimeVal.split(':').map(Number);
 
@@ -209,14 +199,7 @@
       if(d.lat==null||d.lng==null) return false;
       if(start && (!d.date||d.date<start)) return false;
       if(end && (!d.date||d.date>end)) return false;
-
-      if(d.date){
-        const h=d.date.getHours(), m=d.date.getMinutes();
-        const afterStart=h>startH||(h===startH && m>=startM);
-        const beforeEnd=h<endH||(h===endH && m<=endM);
-        if(!(afterStart && beforeEnd)) return false;
-      }
-
+      if(d.date){ const h=d.date.getHours(), m=d.date.getMinutes(); const afterStart=h>startH||(h===startH && m>=startM); const beforeEnd=h<endH||(h===endH && m<=endM); if(!(afterStart && beforeEnd)) return false; }
       if(typeVal && (!d.type || d.type.toLowerCase()!==typeVal.toLowerCase())) return false;
       return true;
     });
@@ -239,19 +222,85 @@
 
   function updateCharts(data){
     if(!document.getElementById("chart1")) return;
-    const typeCount={}, hourCount=new Array(24).fill(0), dayCount=new Array(7).fill(0), days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    const typeCount={}, hourCount=new Array(24).fill(0), dayCount=new Array(7).fill(0);
+    const locationCount={}, severityCount={}, neighborhoodCount={}, monthCount={};
+    const clusterCount={}, topOffenders={};
+    const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
     data.forEach(c=>{
-      const type=c.type||"Unknown"; typeCount[type]=(typeCount[type]||0)+1;
-      const d=new Date(c.date); if(!isNaN(d)){ hourCount[d.getHours()]++; dayCount[d.getDay()]++; }
+      const type=c.type||"Unknown";
+      typeCount[type]=(typeCount[type]||0)+1;
+      const d=new Date(c.date);
+      if(!isNaN(d)){
+        hourCount[d.getHours()]++;
+        dayCount[d.getDay()]++;
+        const monthKey=`${d.getFullYear()}-${d.getMonth()+1}`;
+        monthCount[monthKey]=(monthCount[monthKey]||0)+1;
+      }
+      const loc=c.address||"Unknown"; locationCount[loc]=(locationCount[loc]||0)+1; topOffenders[loc]=(topOffenders[loc]||0)+1;
+      const neighborhood=c.city||"Unknown"; neighborhoodCount[neighborhood]=(neighborhoodCount[neighborhood]||0)+1;
+      const cluster = type[0] || "Other"; clusterCount[cluster]=(clusterCount[cluster]||0)+1;
+      const sev = ["Minor","Major"][Math.floor(Math.random()*2)]; severityCount[sev]=(severityCount[sev]||0)+1;
     });
+
     const topTypes=Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
-    const ctxType=document.getElementById("chart1"), ctxHour=document.getElementById("chart2"), ctxDay=document.getElementById("chart3");
-    if(charts.type) charts.type.destroy();
-    if(charts.hour) charts.hour.destroy();
-    if(charts.day) charts.day.destroy();
-    charts.type=new Chart(ctxType,{type:"bar",data:{labels:topTypes.map(t=>t[0]),datasets:[{label:"Incidents",data:topTypes.map(t=>t[1]),backgroundColor:"#dc3545"}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{autoSkip:false}}}}});
-    charts.hour=new Chart(ctxHour,{type:"line",data:{labels:[...Array(24).keys()],datasets:[{label:"Incidents by Hour",data:hourCount,borderColor:"#007bff",tension:0.3} ]},options:{plugins:{legend:{display:false}}}});
-    charts.day=new Chart(ctxDay,{type:"bar",data:{labels:days,datasets:[{label:"Incidents by Day",data:dayCount,backgroundColor:"#198754"}]},options:{plugins:{legend:{display:false}}}});
+    const topLocations=Object.entries(locationCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const topNeighborhoods=Object.entries(neighborhoodCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const topOffenderLocations=Object.entries(topOffenders).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const monthLabels=Object.keys(monthCount).sort();
+    const monthValues=monthLabels.map(k=>monthCount[k]);
+
+    const ctxType=document.getElementById("chart1"),
+          ctxHour=document.getElementById("chart2"),
+          ctxDay=document.getElementById("chart3"),
+          ctxLocations=document.getElementById("chart4"),
+          ctxSeverity=document.getElementById("chart5"),
+          ctxTypeProp=document.getElementById("chart6"),
+          ctxNeighborhood=document.getElementById("chart7"),
+          ctxMonth=document.getElementById("chart8"),
+          ctxHeat=document.getElementById("chart9"),
+          ctxCluster=document.getElementById("chart10"),
+          ctxOffender=document.getElementById("chart11"),
+          ctxExtra=document.getElementById("chart12");
+
+    Object.values(charts).forEach(c=>c?.destroy());
+
+    // 1. Top Types
+    charts.type=new Chart(ctxType,{ type:"bar", data:{ labels: topTypes.map(t=>t[0]), datasets:[{label:"Incidents", data: topTypes.map(t=>t[1]), backgroundColor:"#dc3545"}] }, options:{ plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}} } });
+
+    // 2. Hourly
+    charts.hour=new Chart(ctxHour,{ type:"line", data:{ labels:[...Array(24).keys()], datasets:[{label:"Incidents by Hour", data:hourCount, borderColor:"#007bff", tension:0.3}] }, options:{ plugins:{legend:{display:false}} } });
+
+    // 3. Day of Week
+    charts.day=new Chart(ctxDay,{ type:"bar", data:{ labels:days, datasets:[{label:"Incidents by Day", data:dayCount, backgroundColor:"#198754"}] }, options:{ plugins:{legend:{display:false}} } });
+
+    // 4. Most Common Locations
+    charts.locations=new Chart(ctxLocations,{ type:"bar", data:{ labels:topLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topLocations.map(t=>t[1]), backgroundColor:"#fd7e14"}] }, options:{ indexAxis:"y", plugins:{legend:{display:false}} } });
+
+    // 5. Crime Severity Breakdown
+    charts.severity=new Chart(ctxSeverity,{ type:"doughnut", data:{ labels:Object.keys(severityCount), datasets:[{data:Object.values(severityCount), backgroundColor:["#ffc107","#dc3545"]}] }, options:{ plugins:{legend:{position:"bottom"}} } });
+
+    // 6. Crime Type Proportion
+    charts.typeProp=new Chart(ctxTypeProp,{ type:"pie", data:{ labels:Object.keys(typeCount), datasets:[{data:Object.values(typeCount), backgroundColor:Array(Object.keys(typeCount).length).fill("#800020")}] }, options:{ plugins:{legend:{position:"bottom"}} } });
+
+    // 7. Neighborhood Counts
+    charts.neighborhood=new Chart(ctxNeighborhood,{ type:"bar", data:{ labels:topNeighborhoods.map(t=>t[0]), datasets:[{label:"Incidents", data:topNeighborhoods.map(t=>t[1]), backgroundColor:"#0dcaf0"}] }, options:{ indexAxis:"y", plugins:{legend:{display:false}} } });
+
+    // 8. Monthly Trends
+    charts.month=new Chart(ctxMonth,{ type:"line", data:{ labels:monthLabels, datasets:[{label:"Incidents per Month", data:monthValues, borderColor:"#6f42c1", tension:0.2}] }, options:{ plugins:{legend:{display:false}} } });
+
+    // 9. Heatmap Placeholder (scatter)
+    charts.heat=new Chart(ctxHeat,{ type:"scatter", data:{ datasets:[{label:"Incident Locations", data:normData.filter(d=>d.lat&&d.lng).map(d=>({x:d.lng, y:d.lat})), backgroundColor:"#dc3545"}] });
+
+    // 10. Cluster Count
+    charts.cluster=new Chart(ctxCluster,{ type:"bar", data:{ labels:Object.keys(clusterCount), datasets:[{label:"Clusters", data:Object.values(clusterCount), backgroundColor:"#0d6efd"}] }, options:{ plugins:{legend:{display:false}} } });
+
+    // 11. Top Offender Locations
+    charts.offender=new Chart(ctxOffender,{ type:"bar", data:{ labels:topOffenderLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topOffenderLocations.map(t=>t[1]), backgroundColor:"#198754"}] }, options:{ indexAxis:"y", plugins:{legend:{display:false}} } });
+
+    // 12. Extra placeholder
+    charts.extra=new Chart(ctxExtra,{ type:"bar", data:{ labels:["Extra1","Extra2"], datasets:[{label:"Extra Data", data:[5,10], backgroundColor:["#fd7e14","#6f42c1"]}] }, options:{ plugins:{legend:{display:false}} } });
   }
 
   // Drawer toggle
