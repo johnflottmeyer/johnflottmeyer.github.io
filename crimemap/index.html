@@ -2,255 +2,180 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Crime Map with Filters (Leaflet)</title>
+  <title>Crime Map with Font Awesome Markers</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Leaflet.awesome-markers CSS & JS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.5/leaflet.awesome-markers.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.5/leaflet.awesome-markers.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
   <style>
-    body { margin:0; font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
-    #controls { padding:10px; display:flex; gap:8px; align-items:center; background:#f6f7f8; border-bottom:1px solid #ddd; flex-wrap:wrap; }
+    body { margin:0; font-family:system-ui; }
+    #controls { padding:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; background:#f6f7f8; border-bottom:1px solid #ddd;}
     #map { height: calc(100vh - 72px); width:100%; }
     select,input[type="date"],button { padding:6px 8px; border-radius:6px; border:1px solid #ccc; }
     .info { font-size:13px; color:#555; margin-left:8px;}
   </style>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
-  <div id="controls">
-    <label>From: <input type="date" id="startDate"></label>
-    <label>To: <input type="date" id="endDate"></label>
+<div id="controls">
+  <label>From: <input type="date" id="startDate"></label>
+  <label>To: <input type="date" id="endDate"></label>
 
-    <label>Type:
-      <select id="crimeType">
-        <option value="">All</option>
-      </select>
-    </label>
+  <label>Type:
+    <select id="crimeType">
+      <option value="">All</option>
+    </select>
+  </label>
 
-    <button id="filterBtn">Apply</button>
-    <button id="resetBtn">Reset</button>
+  <button id="filterBtn">Apply</button>
+  <button id="resetBtn">Reset</button>
 
-    <span class="info" id="status">Loading…</span>
-  </div>
+  <span class="info" id="status">Loading…</span>
+</div>
 
-  <div id="map"></div>
+<div id="map"></div>
 
-  <script>
-  (function(){
-    // -------- CONFIG --------
-    const DATA_URL = "https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
-    const CENTER = [44.0221, -92.4630]; // Rochester default center
-    const ZOOM = 11;
-    // ------------------------
+<script>
+(async function(){
+  const DATA_URL = "https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
+  const CENTER = [44.0221, -92.4630];
+  const ZOOM = 11;
 
-    let map = L.map('map').setView(CENTER, ZOOM);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+  let map = L.map('map').setView(CENTER, ZOOM);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
 
-    const markersLayer = L.layerGroup().addTo(map);
-    let rawData = [];        // raw from feed
-    let normData = [];       // normalized objects used for filtering/rendering
+  let markersLayer = L.layerGroup().addTo(map);
+  let rawData = [];
+  let normData = [];
 
-    // helper: try multiple keys
-    function pick(o, keys){
-      for(const k of keys){
-        if (o == null) break;
-        if (o[k] !== undefined && o[k] !== null && String(o[k]).trim() !== "") return o[k];
-      }
-      return "";
+  function pick(o, keys){
+    for(const k of keys){
+      if (o && o[k] !== undefined && o[k] !== null && String(o[k]).trim() !== "") return o[k];
     }
+    return "";
+  }
 
-    // normalize one record -> {date:Date|null, lat:float|null, lng:float|null, type, address, city, zip, raw}
-    function normalize(rec){
-      // the feed you built uses headers like: datetime, incidentType, FullAddress/address, City/city, Zip, long/lng, lat
-      const raw = rec || {};
-      const dateStr = pick(raw, ['createDateTime','CreateDateTime','createDate','CreateDate','DateTimeIncident','date','datetime','Date']);
-      let date = null;
-      if (dateStr){
-        // try ISO first
-        date = new Date(dateStr);
-        if (isNaN(date)) {
-          // sometimes DateTimeIncident like "10/08 06:19 PM" — try to add year from createDateTime or current year
-          const year = (new Date()).getFullYear();
-          const tryStr = dateStr + " " + year;
-          date = new Date(tryStr);
-          if (isNaN(date)) date = null;
-        }
-      }
+  function normalize(rec){
+    const raw = rec || {};
+    const dateStr = pick(raw, ['createDateTime','CreateDateTime','DateTimeIncident','date','datetime']);
+    let date = dateStr ? new Date(dateStr) : null;
+    const lat = parseFloat(pick(raw, ['lat','Lat','latitude','Latitude']));
+    const lng = parseFloat(pick(raw, ['long','lng','lon','Longitude']));
+    return {
+      raw,
+      date,
+      dateRaw: dateStr || "",
+      lat: (!isNaN(lat) ? lat : null),
+      lng: (!isNaN(lng) ? lng : null),
+      type: pick(raw, ['incidentType','IncidentType','crime','Crime','type','Type','Incident']),
+      address: pick(raw, ['FullAddress','address','Address','location','Location']),
+      city: pick(raw, ['city','City','venue','Venue']),
+      zip: pick(raw, ['zip','Zip','postal','Postal'])
+    };
+  }
 
-      // lat/lng may be named many ways
-      const latRaw = pick(raw, ['lat','Lat','latitude','Latitude','Lat_deg']);
-      const lngRaw = pick(raw, ['long','lng','lon','Lon','longitude','Longitude']);
-
-      const lat = latRaw ? parseFloat(String(latRaw).replace(/[^0-9\.\-]/g,'')) : null;
-      const lng = lngRaw ? parseFloat(String(lngRaw).replace(/[^0-9\.\-]/g,'')) : null;
-
-      const type = pick(raw, ['incidentType','IncidentType','crime','Crime','type','Type','Incident']);
-      const address = pick(raw, ['FullAddress','address','Address','location','Location']);
-      const city = pick(raw, ['city','City','venue','Venue']);
-      const zip = pick(raw, ['zip','Zip','postal','Postal']);
-
-      return {
-        raw,
-        date,
-        dateRaw: dateStr || "",
-        lat: (!isNaN(lat) ? lat : null),
-        lng: (!isNaN(lng) ? lng : null),
-        type: (type || "").toString(),
-        address: address || "",
-        city: city || "",
-        zip: zip || "",
-      };
-    }
-
-    // fetch and build normalized data
-    async function loadData(){
-      document.getElementById('status').textContent = 'Loading data…';
-      try {
-        const res = await fetch(DATA_URL);
-        if(!res.ok) throw new Error('Fetch failed: ' + res.status);
-        rawData = await res.json();
-        // some feeds wrap in { records: [...] } — handle both
-        if (rawData && rawData.records && Array.isArray(rawData.records)) rawData = rawData.records;
-
-        if (!Array.isArray(rawData)) {
-          console.error('Unexpected feed format, got:', rawData);
-          document.getElementById('status').textContent = 'Feed format error (see console)';
-          return;
-        }
-
-        normData = rawData.map(normalize);
-
-        // populate type dropdown: use distinct non-empty types, sorted
-        const types = Array.from(new Set(normData.map(d => d.type).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
-        const select = document.getElementById('crimeType');
-        // remove existing options except "All"
-        select.querySelectorAll('option:not([value=""])').forEach(n=>n.remove());
-        types.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t;
-          opt.textContent = t;
-          select.appendChild(opt);
-        });
-
-        document.getElementById('status').textContent = `Loaded ${normData.length} records`;
-        renderMarkers(normData); // initial display: all (or you can filter)
-      } catch (err){
-        console.error(err);
-        document.getElementById('status').textContent = 'Error loading feed (see console)';
-      }
-    }
-
-    // create popup content (safe)
-    function popupHtml(d){
-      return `<div style="font-size:13px;">
-        <strong>${escapeHtml(d.type || 'Incident')}</strong><br/>
-        ${escapeHtml(d.address || '')}<br/>
-        ${escapeHtml(d.city || '')} ${escapeHtml(d.zip || '')}<br/>
-        <small>${escapeHtml(d.dateRaw || '')}</small>
-      </div>`;
-    }
-
-    // simple escaper
-    function escapeHtml(s){
-      return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    }
-
-    // map rendering
-    function renderMarkers(data){
-      markersLayer.clearLayers();
-      let count = 0;
-      data.forEach(d => {
-        if (d.lat == null || d.lng == null) return;
-        const marker = L.marker([d.lat, d.lng], {
-          icon: L.icon({
-            iconUrl: iconForType(d.type),
-            iconSize: [26, 26],
-            iconAnchor: [13, 26],
-            popupAnchor: [0, -22]
-          })
-        }).bindPopup(popupHtml(d));
-        markersLayer.addLayer(marker);
-        count++;
-      });
-      document.getElementById('status').textContent = `Showing ${count} of ${normData.length} records`;
-      if (count > 0) {
-        // optionally fit bounds to visible markers
-        const bounds = markersLayer.getBounds();
-        if (bounds.isValid()) map.fitBounds(bounds.pad(0.2));
-      }
-    }
-
-    // pick icon url per type (customize URLs or host icons). Defaults to colored dots.
-    function iconForType(type){
-      if (!type) return 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
-      const t = type.toLowerCase();
-      if (t.includes('traffic')) return 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png';
-      if (t.includes('burglary') || t.includes('theft')) return 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
-      if (t.includes('drugs')) return 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png';
-      if (t.includes('assist')) return 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png';
-      if (t.includes('crisis') || t.includes('person')) return 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-      return 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
-    }
-
-    // filtering logic — uses normalized date object
-    function applyFilters(){
-      const startVal = document.getElementById('startDate').value;
-      const endVal = document.getElementById('endDate').value;
-      const typeVal = document.getElementById('crimeType').value;
-
-      const start = startVal ? new Date(startVal + 'T00:00:00') : null;
-      const end = endVal ? new Date(endVal + 'T23:59:59') : null;
-
-      const filtered = normData.filter(d => {
-        // must have coordinates
-        if (d.lat == null || d.lng == null) return false;
-
-        // date checks
-        if (start && (!d.date || d.date < start)) return false;
-        if (end && (!d.date || d.date > end)) return false;
-
-        // type check (case-insensitive)
-        if (typeVal && (!d.type || d.type.toLowerCase() !== typeVal.toLowerCase())) return false;
-
-        return true;
-      });
-
-      renderMarkers(filtered);
-    }
-
-    // reset filters
-    function resetFilters(){
-      document.getElementById('startDate').value = '';
-      document.getElementById('endDate').value = '';
-      document.getElementById('crimeType').value = '';
+  async function loadData(){
+    document.getElementById('status').textContent = 'Loading data…';
+    try {
+      const res = await fetch(DATA_URL);
+      if(!res.ok) throw new Error('Fetch failed: ' + res.status);
+      rawData = await res.json();
+      if (rawData && rawData.records) rawData = rawData.records;
+      if (!Array.isArray(rawData)) { console.error('Bad feed:', rawData); return; }
+      normData = rawData.map(normalize);
+      populateTypes();
       renderMarkers(normData);
+      document.getElementById('status').textContent = `Loaded ${normData.length} records`;
+    } catch (err) {
+      console.error(err);
+      document.getElementById('status').textContent = 'Error loading feed';
     }
+  }
 
-    // wire UI
-    document.getElementById('filterBtn').addEventListener('click', applyFilters);
-    document.getElementById('resetBtn').addEventListener('click', resetFilters);
+  function populateTypes(){
+    const types = Array.from(new Set(normData.map(d=>d.type).filter(Boolean))).sort();
+    const select = document.getElementById('crimeType');
+    select.querySelectorAll('option:not([value=""])').forEach(n=>n.remove());
+    types.forEach(t => { const opt = document.createElement('option'); opt.value = t; opt.textContent = t; select.appendChild(opt); });
+  }
 
-    // load on start and periodically refresh underlying feed (but keep current filters)
-    loadData();
-    setInterval(async () => {
-      const prevType = document.getElementById('crimeType').value;
-      const prevStart = document.getElementById('startDate').value;
-      const prevEnd = document.getElementById('endDate').value;
+  function popupHtml(d){
+    return `<div style="font-size:13px;">
+      <strong>${d.type || 'Incident'}</strong><br/>
+      ${d.address || ''}<br/>
+      ${d.city || ''} ${d.zip || ''}<br/>
+      <small>${d.dateRaw || ''}</small>
+    </div>`;
+  }
 
-      await loadData();
+  function iconForType(type){
+    const t = (type||'').toLowerCase();
+    if(t.includes('traffic')) return {icon:'car', markerColor:'blue'};
+    if(t.includes('burglary')) return {icon:'person-bolt', markerColor:'red'};
+    if(t.includes('theft')) return {icon:'hand-holding', markerColor:'orange'};
+    if(t.includes('drugs')) return {icon:'prescription-bottle', markerColor:'purple'};
+    if(t.includes('assist')) return {icon:'hands-helping', markerColor:'green'};
+    if(t.includes('crisis')) return {icon:'exclamation-triangle', markerColor:'yellow'};
+    return {icon:'map-marker-alt', markerColor:'cadetblue'};
+  }
 
-      // restore filters
-      document.getElementById('crimeType').value = prevType;
-      document.getElementById('startDate').value = prevStart;
-      document.getElementById('endDate').value = prevEnd;
-      // re-apply filters if any
-      if (prevType || prevStart || prevEnd) applyFilters();
-    }, 5*60*1000); // refresh every 5 minutes
+  function renderMarkers(data){
+    markersLayer.clearLayers();
+    let count = 0;
+    data.forEach(d=>{
+      if(d.lat == null || d.lng == null) return;
+      const iconData = iconForType(d.type);
+      const marker = L.AwesomeMarkers.icon({
+        icon: iconData.icon,
+        prefix: 'fa',
+        markerColor: iconData.markerColor,
+        spin: false
+      });
+      L.marker([d.lat,d.lng], {icon:marker}).bindPopup(popupHtml(d)).addTo(markersLayer);
+      count++;
+    });
+    document.getElementById('status').textContent = `Showing ${count} of ${normData.length} records`;
+  }
 
-    // helpful console instruction if something fails
-    console.log('Map widget initialized. If nothing appears check the browser console for errors and verify DATA_URL contains your JSON feed.');
-  })();
-  </script>
+  function applyFilters(){
+    const startVal = document.getElementById('startDate').value;
+    const endVal = document.getElementById('endDate').value;
+    const typeVal = document.getElementById('crimeType').value;
+    const start = startVal ? new Date(startVal+'T00:00:00') : null;
+    const end = endVal ? new Date(endVal+'T23:59:59') : null;
+
+    const filtered = normData.filter(d=>{
+      if(d.lat == null || d.lng == null) return false;
+      if(start && (!d.date || d.date<start)) return false;
+      if(end && (!d.date || d.date>end)) return false;
+      if(typeVal && (!d.type || d.type.toLowerCase()!==typeVal.toLowerCase())) return false;
+      return true;
+    });
+    renderMarkers(filtered);
+  }
+
+  document.getElementById('filterBtn').addEventListener('click', applyFilters);
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    document.getElementById('startDate').value='';
+    document.getElementById('endDate').value='';
+    document.getElementById('crimeType').value='';
+    renderMarkers(normData);
+  });
+
+  await loadData();
+
+})();
+</script>
 </body>
 </html>
