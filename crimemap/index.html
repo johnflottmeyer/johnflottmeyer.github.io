@@ -52,6 +52,7 @@
       font-size:14px;
     }
     .legend i { margin-right:6px; }
+    .legend h4 { margin-top: 0; }
     #disclaimer {
       position: fixed;
       bottom: 0;
@@ -67,6 +68,15 @@
     }
 
     /* Chart drawer styles on right */
+    #chartToggle{
+      background-color:#FFF;
+      padding: 5px;
+      position: absolute;
+      right: 10px;
+      top: 70px;
+      z-index: 1000;
+    }
+
     .drawer {
       position: absolute;
       top: 0;
@@ -106,13 +116,9 @@
 
     /* Optional: darker mode adjustment */
     @media (prefers-color-scheme: dark) {
-      .drawer {
+      #controls, #disclaimer, .legend {
         background: rgba(30, 30, 30, 0.95);
         color: #f1f1f1;
-      }
-      .drawer-header {
-        background: #222;
-        border-bottom-color: #444;
       }
     }
   </style>
