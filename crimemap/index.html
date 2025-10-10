@@ -9,145 +9,45 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Font Awesome -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik+Glitch&display=swap" rel="stylesheet">
-  <style>
-    .roboto-<uniquifier> {
-      font-family: "Roboto", sans-serif;
-      font-optical-sizing: auto;
-      font-weight: <weight>;
-      font-style: normal;
-      font-variation-settings:
-        "wdth" 100;
-    }
-    .rubik-glitch-regular {
-      font-family: "Rubik Glitch", system-ui;
-      font-weight: 400;
-      font-style: normal;
-    }
 
+  <style>
     body { margin:0; font-family: "Roboto", Arial, sans-serif; }
-    .logo{
-      font-family: "Rubik Glitch", Arial, sans-serif;
-      margin: 0 30px 0 10px;
-    }
-    #controls {
-      padding:10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      align-items:center;
-      background:#f6f7f8;
-      border-bottom:1px solid #ccc;
-      z-index: 1001;
-      position: relative;
-    }
-    #controls label { font-size: 14px; }
-    #controls select,input[type="date"],button {
-      padding:5px 8px;
-      border-radius:4px;
-      border:1px solid #ccc;
-      font-size:14px;
-    }
+    .logo{ font-family: "Rubik Glitch", Arial, sans-serif; margin: 0 30px 0 10px; }
+    #controls { padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#f6f7f8; border-bottom:1px solid #ccc; z-index: 1001; position: relative; }
+    #controls select,input[type="date"],button { padding:5px 8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
     #map { height: calc(100vh - 100px); width:100%; position:relative; }
     .info { font-size:13px; color:#555; }
-    .fa-icon { 
-      font-size: 20px; 
-      background-color: rgba(255,255,255,0.5);
-      border:1px solid #FFF;
-      padding: 5px;
-      border-radius: 60%;
-    }
-    .legend {
-      background:white;
-      padding:8px;
-      border-radius:6px;
-      box-shadow:0 0 15px rgba(0,0,0,0.2);
-      font-size:14px;
-    }
+    .fa-icon { font-size: 20px; background-color: rgba(255,255,255,0.5); border:1px solid #FFF; padding: 5px; border-radius: 60%; }
+    .legend { background:white; padding:8px; border-radius:6px; box-shadow:0 0 15px rgba(0,0,0,0.2); font-size:14px; }
     .legend i { margin-right:6px; }
     .legend h4 { margin-top: 0; }
-    #disclaimer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(255,255,255,0.95);
-      padding: 8px 12px;
-      font-size: 13px;
-      text-align: center;
-      border-top: 1px solid #ccc;
-      color: #333;
-      z-index: 1000;
-    }
+    #disclaimer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); padding: 8px 12px; font-size: 13px; text-align: center; border-top: 1px solid #ccc; color: #333; z-index: 1000; }
 
-    /* Chart drawer styles on right */
-    #chartToggle{
-      background-color:#FFF;
-      padding: 5px;
-      position: absolute;
-      right: 10px;
-      top: 70px;
-      z-index: 1000;
-    }
-
-    .drawer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 350px;
-      height: 100%;
-      backdrop-filter: blur(10px);
-      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      overflow-y: auto;
-      z-index: 1001;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .drawer.open {
-      transform: translateX(0);
-    }
-
-    .drawer-header {
-      padding: 10px 16px;
-      background: #f7f7f7;
-      border-bottom: 1px solid #ddd;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .drawer-content {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-    }
-
+    #chartToggle{ background-color:#FFF; padding: 5px; position: absolute; right: 10px; top: 70px; z-index: 1000; }
+    .drawer { position: absolute; top: 0; right: 0; width: 350px; height: 100%; backdrop-filter: blur(10px); box-shadow: -4px 0 10px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; z-index: 1001; display: flex; flex-direction: column; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 10px 16px; background: #f7f7f7; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+    .drawer-content { flex: 1; padding: 16px; overflow-y: auto; }
     @media (prefers-color-scheme: dark) {
-      #controls {
-        background-color: #638C45;
-        color: #f1f1f1;
-      }
-      .legend{
-        background-color: #D9C0A3;
-      }
-      #disclaimer{
-         background-color: #D7D7D9;
-      }
-      .info {
-        color: #929292;
-      }
+      #controls { background-color: #638C45; color: #f1f1f1; }
+      .legend{ background-color: #D9C0A3; }
+      #disclaimer{ background-color: #D7D7D9; }
+      .info { color: #929292; }
     }
   </style>
 </head>
@@ -204,12 +104,13 @@
 
   const map = L.map('map', { layers: [streetTiles] }).setView(CENTER, ZOOM);
 
-  let markersLayer = L.layerGroup().addTo(map);
+  // --- MarkerCluster integration ---
+  let markersLayer = L.markerClusterGroup({ chunkedLoading:true, showCoverageOnHover:false });
+  map.addLayer(markersLayer);
+
   let rawData = [];
   let normData = [];
   let charts = {};
-
-  //const PALETTE = ["#D7D7D9","#638C45","#D9C0A3","#A66B38","#401201"];
   const PALETTE = ["#401201"];
   const ICONS = {
     "accident": "fa-car-burst",
@@ -239,13 +140,7 @@
     "warrant": "fa-gavel"
   };
 
-  function pick(o, keys){
-    for(const k of keys){
-      if (o && o[k] !== undefined && o[k] !== null && String(o[k]).trim() !== "") return o[k];
-    }
-    return "";
-  }
-
+  function pick(o, keys){ for(const k of keys){ if (o && o[k] !== undefined && o[k] !== null && String(o[k]).trim() !== "") return o[k]; } return ""; }
   function normalize(rec){
     const raw = rec || {};
     const dateStr = pick(raw, ['createDateTime','CreateDateTime','DateTimeIncident','date','datetime']);
@@ -273,7 +168,6 @@
       let data = await res.json();
       rawData = Array.isArray(data) ? data : (data.records || []);
       if (!Array.isArray(rawData)) throw new Error('Unexpected data format');
-
       normData = rawData.map(normalize);
       populateTypes();
       renderMarkers(normData);
@@ -357,17 +251,9 @@
       div.innerHTML = `<h4>Incident Types</h4>`;
       Object.entries(ICONS).forEach(([key, icon], i) => {
         const color = PALETTE[i % PALETTE.length];
-        div.innerHTML += `
-          <div class="legend-item">
-            <i class="fa ${icon}" style="color:${color}"></i>
-            <span>${key}</span>
-          </div>`;
+        div.innerHTML += `<div class="legend-item"><i class="fa ${icon}" style="color:${color}"></i> <span>${key}</span></div>`;
       });
-      div.innerHTML += `
-        <div class="legend-item">
-          <i class="fa fa-map-marker-alt" style="color:#6c757d"></i>
-          <span>Other / Unknown</span>
-        </div>`;
+      div.innerHTML += `<div class="legend-item"><i class="fa fa-map-marker-alt" style="color:#6c757d"></i> <span>Other / Unknown</span></div>`;
       return div;
     };
     legend.addTo(map);
@@ -385,15 +271,10 @@
       const type = c.type || "Unknown";
       typeCount[type] = (typeCount[type] || 0) + 1;
       const d = new Date(c.date);
-      if (!isNaN(d)) {
-        hourCount[d.getHours()]++;
-        dayCount[d.getDay()]++;
-      }
+      if (!isNaN(d)) { hourCount[d.getHours()]++; dayCount[d.getDay()]++; }
     });
 
-    const topTypes = Object.entries(typeCount)
-      .sort((a,b) => b[1]-a[1])
-      .slice(0,10);
+    const topTypes = Object.entries(typeCount).sort((a,b) => b[1]-a[1]).slice(0,10);
 
     const ctxType = document.getElementById("chart1");
     const ctxHour = document.getElementById("chart2");
@@ -405,42 +286,18 @@
 
     charts.type = new Chart(ctxType, {
       type: "bar",
-      data: {
-        labels: topTypes.map(t => t[0]),
-        datasets: [{
-          label: "Incidents",
-          data: topTypes.map(t => t[1]),
-          backgroundColor: "#dc3545"
-        }]
-      },
+      data: { labels: topTypes.map(t => t[0]), datasets: [{ label: "Incidents", data: topTypes.map(t => t[1]), backgroundColor: "#dc3545" }] },
       options: { plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}}}
     });
-
     charts.hour = new Chart(ctxHour, {
       type: "line",
-      data: {
-        labels: [...Array(24).keys()],
-        datasets: [{
-          label: "Incidents by Hour",
-          data: hourCount,
-          borderColor: "#007bff",
-          tension: 0.3
-        }]
-      },
-      options: { plugins:{legend:{display:false}}}
+      data: { labels: [...Array(24).keys()], datasets: [{ label: "Incidents by Hour", data: hourCount, borderColor: "#007bff", tension: 0.3 }] },
+      options: { plugins:{legend:{display:false}} }
     });
-
     charts.day = new Chart(ctxDay, {
       type: "bar",
-      data: {
-        labels: days,
-        datasets: [{
-          label: "Incidents by Day",
-          data: dayCount,
-          backgroundColor: "#198754"
-        }]
-      },
-      options: { plugins:{legend:{display:false}}}
+      data: { labels: days, datasets: [{ label: "Incidents by Day", data: dayCount, backgroundColor: "#198754" }] },
+      options: { plugins:{legend:{display:false}} }
     });
   }
 
@@ -453,14 +310,9 @@
     if (open === undefined) drawer.classList.toggle("open");
     else drawer.classList.toggle("open", open);
     const icon = toggle.querySelector("i");
-    if (drawer.classList.contains("open")) {
-      icon.classList.replace("fa-chart-bar", "fa-angle-right");
-      setTimeout(() => updateCharts(normData), 100);
-    } else {
-      icon.classList.replace("fa-angle-right", "fa-chart-bar");
-    }
+    if (drawer.classList.contains("open")) { icon.classList.replace("fa-chart-bar", "fa-angle-right"); setTimeout(() => updateCharts(normData), 100); }
+    else icon.classList.replace("fa-angle-right", "fa-chart-bar");
   }
-
   toggle.addEventListener("click", () => toggleDrawer());
   closeBtn.addEventListener("click", () => toggleDrawer(false));
 
@@ -471,24 +323,17 @@
     { name: "Satellite", layer: satelliteTiles }
   ];
   let currentStyle = 0;
-
   function setMapStyle(index) {
     map.eachLayer(layer => map.removeLayer(layer));
     styles[index].layer.addTo(map);
     markersLayer.addTo(map);
     mapToggle.textContent = "Map: " + styles[index].name;
   }
-
-  mapToggle.addEventListener("click", () => {
-    currentStyle = (currentStyle + 1) % styles.length;
-    setMapStyle(currentStyle);
-  });
+  mapToggle.addEventListener("click", () => { currentStyle = (currentStyle + 1) % styles.length; setMapStyle(currentStyle); });
 
   document.getElementById('filterBtn').addEventListener('click', applyFilters);
   document.getElementById('resetBtn').addEventListener('click', ()=>{
-    document.getElementById('startDate').value='';
-    document.getElementById('endDate').value='';
-    document.getElementById('crimeType').value='';
+    document.getElementById('startDate').value=''; document.getElementById('endDate').value=''; document.getElementById('crimeType').value='';
     renderMarkers(normData);
     updateCharts(normData);
   });
