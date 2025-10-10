@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Crime Map with Font Awesome 6 Markers</title>
+  <title>Crime Map with Font Awesome 6 Markers & Legend</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <!-- Leaflet -->
@@ -18,7 +18,22 @@
     #map { height: calc(100vh - 72px); width:100%; }
     select,input[type="date"],button { padding:6px 8px; border-radius:6px; border:1px solid #ccc; }
     .info { font-size:13px; color:#555; margin-left:8px;}
-    .fa-icon { font-size: 24px; color: red; }
+    .fa-icon { font-size: 24px; }
+    .legend i { margin-right: 6px; }
+    #disclaimer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255,255,255,0.9);
+      padding: 8px 12px;
+      font-size: 13px;
+      text-align: center;
+      border-top: 1px solid #ccc;
+      color: #333;
+      z-index: 1000;
+    }
+
   </style>
 </head>
 <body>
@@ -48,15 +63,9 @@
   const ZOOM = 11;
 
   let map = L.map('map').setView(CENTER, ZOOM);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap &copy; Carto',
-  subdomains: 'abcd',
-  maxZoom: 19
-}).addTo(map);
-
-  /*L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
-  }).addTo(map);*/
+  }).addTo(map);
 
   let markersLayer = L.layerGroup().addTo(map);
   let rawData = [];
@@ -99,6 +108,7 @@
       normData = rawData.map(normalize);
       populateTypes();
       renderMarkers(normData);
+      addLegend(map);
       document.getElementById('status').textContent = `Loaded ${normData.length} records`;
     } catch (err) {
       console.error(err);
@@ -171,6 +181,36 @@
     renderMarkers(filtered);
   }
 
+  function addLegend(map) {
+    const legend = L.control({position: 'bottomright'});
+    legend.onAdd = function () {
+        const div = L.DomUtil.create('div', 'info legend');
+        div.style.background = "white";
+        div.style.padding = "8px";
+        div.style.borderRadius = "6px";
+        div.style.boxShadow = "0 0 15px rgba(0,0,0,0.2)";
+        div.innerHTML += "<strong>Crime Types</strong><br/>";
+
+        const types = [
+            {label: "Traffic", icon: "fa-car", color: "blue"},
+            {label: "Burglary", icon: "fa-user-secret", color: "orange"},
+            {label: "Theft", icon: "fa-hand-paper", color: "purple"},
+            {label: "Drugs", icon: "fa-prescription-bottle-medical", color: "green"},
+            {label: "Assist", icon: "fa-hands-helping", color: "cadetblue"},
+            {label: "Crisis", icon: "fa-triangle-exclamation", color: "yellow"},
+            {label: "Other", icon: "fa-map-marker-alt", color: "red"}
+        ];
+
+        types.forEach(type => {
+            div.innerHTML +=
+                `<i class="fa ${type.icon}" style="color:${type.color}; font-size:18px;"></i> ${type.label}<br/>`;
+        });
+
+        return div;
+    };
+    legend.addTo(map);
+  }
+
   document.getElementById('filterBtn').addEventListener('click', applyFilters);
   document.getElementById('resetBtn').addEventListener('click', ()=>{
     document.getElementById('startDate').value='';
@@ -182,5 +222,8 @@
   await loadData();
 })();
 </script>
+<div id="disclaimer">
+  ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
+</div>
 </body>
 </html>
