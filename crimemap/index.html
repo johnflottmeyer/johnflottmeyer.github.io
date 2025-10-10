@@ -39,8 +39,7 @@
     .info { font-size:13px; color:#555; }
     .fa-icon { 
       font-size: 20px; 
-      /*background-color: rgba(255,255,255,0.8);*/
-      backdrop-filter: blur(10px);
+      background-color: rgba(255,255,255,0.5);
       border:1px solid #FFF;
       padding: 5px;
       border-radius: 60%;
@@ -135,13 +134,7 @@
   <button id="filterBtn">Apply</button>
   <button id="resetBtn">Reset</button>
 
-  <label>Map Style:
-    <select id="mapStyle">
-      <option value="street">Street</option>
-      <option value="dark">Dark</option>
-      <option value="satellite">Satellite</option>
-    </select>
-  </label>
+  <button id="mapToggle">Map: Street</button>
 
   <span class="info" id="status">Loading…</span>
 </div>
@@ -246,7 +239,7 @@
       <small>${d.dateRaw || ''}</small>
     </div>`;
   }
-
+/*
   function iconForType(type){
     const t = (type||'').toLowerCase();
     let iconClass = "fa-map-marker-alt";
@@ -264,7 +257,52 @@
       iconSize: [24, 24],
       iconAnchor: [12, 24]
     });
-  }
+  }*/CENTERfunction iconForType(type) {
+  const t = (type || '').toLowerCase();
+  let iconClass = "fa-map-marker-alt";
+  let color = "#6c757d"; // neutral gray fallback
+
+  const icons = {
+    "accident": ["fa-car-burst", "#dc3545"],
+    "accident injury": ["fa-ambulance", "#c82333"],
+    "alarm": ["fa-bell", "#ffc107"],
+    "animal": ["fa-paw", "#795548"],
+    "app order": ["fa-mobile-screen", "#6c757d"],
+    "assist": ["fa-hands-helping", "#17a2b8"],
+    "assist fd": ["fa-fire-extinguisher", "#fd7e14"],
+    "community service": ["fa-people-group", "#20c997"],
+    "damage to property": ["fa-house-crack", "#6610f2"],
+    "death investigation": ["fa-cross", "#212529"],
+    "drugs - paraphernalia": ["fa-capsules", "#28a745"],
+    "escape": ["fa-person-running", "#e83e8c"],
+    "escort": ["fa-shield-halved", "#007bff"],
+    "medical": ["fa-stethoscope", "#0dcaf0"],
+    "new call": ["fa-bolt", "#6610f2"],
+    "paper service": ["fa-file-signature", "#6f42c1"],
+    "parking violation": ["fa-square-parking", "#adb5bd"],
+    "person in crisis": ["fa-triangle-exclamation", "#ff851b"],
+    "probation check": ["fa-id-card", "#17a2b8"],
+    "project lifesaver": ["fa-satellite-dish", "#6610f2"],
+    "suspicious circumstance": ["fa-eye", "#ffc107"],
+    "traffic assist - complaint": ["fa-road", "#007bff"],
+    "traffic enforcement": ["fa-gauge-high", "#0d6efd"],
+    "traffic stop": ["fa-stop", "#dc3545"],
+    "warrant": ["fa-gavel", "#343a40"]
+  };
+
+  // find a matching key using substring search
+  const match = Object.entries(icons).find(([k]) => t.includes(k));
+  if (match) [iconClass, color] = match[1];
+  else console.warn(`⚠️ Unknown incident type: "${type}" — using fallback icon.`);
+
+  return L.divIcon({
+    html: `<i class="fa ${iconClass} fa-icon" style="color:${color}"></i>`,
+    className: "",
+    iconSize: [24, 24],
+    iconAnchor: [12, 24]
+  });
+}
+
 
   function renderMarkers(data){
     markersLayer.clearLayers();
@@ -400,14 +438,27 @@
     toggle.querySelector("i").classList.toggle("fa-angle-left");
   });
 
-  // Map style toggle
-  document.getElementById("mapStyle").addEventListener("change", function(){
+  // Map style toggle (cycles between Street → Dark → Satellite)
+  const mapToggle = document.getElementById("mapToggle");
+  const styles = [
+    { name: "Street", layer: streetTiles },
+    { name: "Dark", layer: darkTiles },
+    { name: "Satellite", layer: satelliteTiles }
+  ];
+  let currentStyle = 0;
+
+  function setMapStyle(index) {
     map.eachLayer(layer => map.removeLayer(layer));
-    if(this.value === "street") streetTiles.addTo(map);
-    if(this.value === "dark") darkTiles.addTo(map);
-    if(this.value === "satellite") satelliteTiles.addTo(map);
+    styles[index].layer.addTo(map);
     markersLayer.addTo(map);
+    mapToggle.textContent = "Map: " + styles[index].name;
+  }
+
+  mapToggle.addEventListener("click", () => {
+    currentStyle = (currentStyle + 1) % styles.length;
+    setMapStyle(currentStyle);
   });
+
 
   document.getElementById('filterBtn').addEventListener('click', applyFilters);
   document.getElementById('resetBtn').addEventListener('click', ()=>{
