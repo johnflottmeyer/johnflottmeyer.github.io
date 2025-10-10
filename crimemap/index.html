@@ -239,25 +239,8 @@
       <small>${d.dateRaw || ''}</small>
     </div>`;
   }
-/*
-  function iconForType(type){
-    const t = (type||'').toLowerCase();
-    let iconClass = "fa-map-marker-alt";
-    let color = "red";
-    if(t.includes("traffic")) { iconClass = "fa-car"; color = "blue"; }
-    if(t.includes("burglary")) { iconClass = "fa-user-secret"; color = "orange"; }
-    if(t.includes("theft")) { iconClass = "fa-hand-paper"; color = "purple"; }
-    if(t.includes("drugs")) { iconClass = "fa-prescription-bottle-medical"; color = "green"; }
-    if(t.includes("assist")) { iconClass = "fa-hands-helping"; color = "cadetblue"; }
-    if(t.includes("crisis")) { iconClass = "fa-triangle-exclamation"; color = "yellow"; }
 
-    return L.divIcon({
-      html: `<i class="fa ${iconClass} fa-icon" style="color:${color}"></i>`,
-      className: "",
-      iconSize: [24, 24],
-      iconAnchor: [12, 24]
-    });
-  }*/CENTERfunction iconForType(type) {
+function iconForType(type) {
   const t = (type || '').toLowerCase();
   let iconClass = "fa-map-marker-alt";
   let color = "#6c757d"; // neutral gray fallback
