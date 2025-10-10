@@ -267,41 +267,89 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
     Object.values(charts).forEach(c=>c?.destroy());
 
     // 1. Top Types
-    charts.type=new Chart(ctxType,{ type:"bar", data:{ labels: topTypes.map(t=>t[0]), datasets:[{label:"Incidents", data: topTypes.map(t=>t[1]), backgroundColor:"#dc3545"}] }, options:{ plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}} } });
+  charts.type=new Chart(ctxType,{
+    type:"bar",
+    data:{ labels: topTypes.map(t=>t[0]), datasets:[{label:"Incidents", data: topTypes.map(t=>t[1]), backgroundColor:"#dc3545"}] },
+    options:{ plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}} }
+  });
 
-    // 2. Hourly
-    charts.hour=new Chart(ctxHour,{ type:"line", data:{ labels:[...Array(24).keys()], datasets:[{label:"Incidents by Hour", data:hourCount, borderColor:"#007bff", tension:0.3}] }, options:{ plugins:{legend:{display:false}} } });
+  // 2. Hourly
+  charts.hour=new Chart(ctxHour,{
+    type:"line",
+    data:{ labels:[...Array(24).keys()], datasets:[{label:"Incidents by Hour", data:hourCount, borderColor:"#007bff", tension:0.3}] },
+    options:{ plugins:{legend:{display:false}} }
+  });
 
-    // 3. Day of Week
-    charts.day=new Chart(ctxDay,{ type:"bar", data:{ labels:days, datasets:[{label:"Incidents by Day", data:dayCount, backgroundColor:"#198754"}] }, options:{ plugins:{legend:{display:false}} } });
+  // 3. Day of Week
+  charts.day=new Chart(ctxDay,{
+    type:"bar",
+    data:{ labels:days, datasets:[{label:"Incidents by Day", data:dayCount, backgroundColor:"#198754"}] },
+    options:{ plugins:{legend:{display:false}} }
+  });
 
-    // 4. Most Common Locations
-    charts.locations=new Chart(ctxLocations,{ type:"bar", data:{ labels:topLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topLocations.map(t=>t[1]), backgroundColor:"#fd7e14"}] }, options:{ indexAxis:"y", plugins:{legend:{display:false}} } });
+  // 4. Most Common Locations
+  charts.locations=new Chart(ctxLocations,{
+    type:"bar",
+    data:{ labels:topLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topLocations.map(t=>t[1]), backgroundColor:"#fd7e14"}] },
+    options:{ indexAxis:"y", plugins:{legend:{display:false}} }
+  });
 
-    // 5. Crime Severity Breakdown
-    charts.severity=new Chart(ctxSeverity,{ type:"doughnut", data:{ labels:Object.keys(severityCount), datasets:[{data:Object.values(severityCount), backgroundColor:["#ffc107","#dc3545"]}] }, options:{ plugins:{legend:{position:"bottom"}} } });
+  // 5. Crime Severity Breakdown
+  charts.severity=new Chart(ctxSeverity,{
+    type:"doughnut",
+    data:{ labels:Object.keys(severityCount), datasets:[{data:Object.values(severityCount), backgroundColor:["#ffc107","#dc3545"]}] },
+    options:{ plugins:{legend:{position:"bottom"}} }
+  });
 
-    // 6. Crime Type Proportion
-    charts.typeProp=new Chart(ctxTypeProp,{ type:"pie", data:{ labels:Object.keys(typeCount), datasets:[{data:Object.values(typeCount), backgroundColor:Array(Object.keys(typeCount).length).fill("#800020")}] }, options:{ plugins:{legend:{position:"bottom"}} } });
+  // 6. Crime Type Proportion
+  charts.typeProp=new Chart(ctxTypeProp,{
+    type:"pie",
+    data:{ labels:Object.keys(typeCount), datasets:[{data:Object.values(typeCount), backgroundColor:Array(Object.keys(typeCount).length).fill("#800020")}] },
+    options:{ plugins:{legend:{position:"bottom"}} }
+  });
 
-    // 7. Neighborhood Counts
-    charts.neighborhood=new Chart(ctxNeighborhood,{ type:"bar", data:{ labels:topNeighborhoods.map(t=>t[0]), datasets:[{label:"Incidents", data:topNeighborhoods.map(t=>t[1]), backgroundColor:"#0dcaf0"}] }, options:{ indexAxis:"y", plugins:{legend:{display:false}} } });
+  // 7. Neighborhood Counts
+  charts.neighborhood=new Chart(ctxNeighborhood,{
+    type:"bar",
+    data:{ labels:topNeighborhoods.map(t=>t[0]), datasets:[{label:"Incidents", data:topNeighborhoods.map(t=>t[1]), backgroundColor:"#0dcaf0"}] },
+    options:{ indexAxis:"y", plugins:{legend:{display:false}} }
+  });
 
-    // 8. Monthly Trends
-    charts.month=new Chart(ctxMonth,{ type:"line", data:{ labels:monthLabels, datasets:[{label:"Incidents per Month", data:monthValues, borderColor:"#6f42c1", tension:0.2}] }, options:{ plugins:{legend:{display:false}} } });
+  // 8. Monthly Trends
+  charts.month=new Chart(ctxMonth,{
+    type:"line",
+    data:{ labels:monthLabels, datasets:[{label:"Incidents per Month", data:monthValues, borderColor:"#6f42c1", tension:0.2}] },
+    options:{ plugins:{legend:{display:false}} }
+  });
 
-    // 9. Heatmap Placeholder (scatter)
-    charts.heat=new Chart(ctxHeat,{ type:"scatter", data:{ datasets:[{label:"Incident Locations", data:normData.filter(d=>d.lat&&d.lng).map(d=>({x:d.lng, y:d.lat})), backgroundColor:"#dc3545"}] });
+  // 9. Heatmap Placeholder (scatter)
+  charts.heat=new Chart(ctxHeat,{
+    type:"scatter",
+    data:{ datasets:[{label:"Incident Locations", data:normData.filter(d=>d.lat&&d.lng).map(d=>({x:d.lng, y:d.lat})), backgroundColor:"#dc3545"}] },
+    options:{} 
+  });
 
-    // 10. Cluster Count
-    charts.cluster=new Chart(ctxCluster,{ type:"bar", data:{ labels:Object.keys(clusterCount), datasets:[{label:"Clusters", data:Object.values(clusterCount), backgroundColor:"#0d6efd"}] }, options:{ plugins:{legend:{display:false}} } });
+  // 10. Cluster Count
+  charts.cluster=new Chart(ctxCluster,{
+    type:"bar",
+    data:{ labels:Object.keys(clusterCount), datasets:[{label:"Clusters", data:Object.values(clusterCount), backgroundColor:"#0d6efd"}] },
+    options:{ plugins:{legend:{display:false}} }
+  });
 
-    // 11. Top Offender Locations
-    charts.offender=new Chart(ctxOffender,{ type:"bar", data:{ labels:topOffenderLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topOffenderLocations.map(t=>t[1]), backgroundColor:"#198754"}] }, options:{ indexAxis:"y", plugins:{legend:{display:false}} } });
+  // 11. Top Offender Locations
+  charts.offender=new Chart(ctxOffender,{
+    type:"bar",
+    data:{ labels:topOffenderLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topOffenderLocations.map(t=>t[1]), backgroundColor:"#198754"}] },
+    options:{ indexAxis:"y", plugins:{legend:{display:false}} }
+  });
 
-    // 12. Extra placeholder
-    charts.extra=new Chart(ctxExtra,{ type:"bar", data:{ labels:["Extra1","Extra2"], datasets:[{label:"Extra Data", data:[5,10], backgroundColor:["#fd7e14","#6f42c1"]}] }, options:{ plugins:{legend:{display:false}} } });
-  }
+  // 12. Extra placeholder
+  charts.extra=new Chart(ctxExtra,{
+    type:"bar",
+    data:{ labels:["Extra1","Extra2"], datasets:[{label:"Extra Data", data:[5,10], backgroundColor:["#fd7e14","#6f42c1"]}] },
+    options:{ plugins:{legend:{display:false}} }
+  });
+}
 
   // Drawer toggle
   const drawer=document.getElementById("drawer"), toggle=document.getElementById("chartToggle"), closeBtn=document.getElementById("closeDrawer");
