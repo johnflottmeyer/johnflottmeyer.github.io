@@ -67,7 +67,7 @@
       z-index: 1000;
     }
 
-    /* Chart drawer toggle */
+    /* Chart drawer styles on right */
     #chartToggle{
       background-color:#FFF;
       padding: 5px;
@@ -75,10 +75,8 @@
       right: 10px;
       top: 70px;
       z-index: 1000;
-      cursor:pointer;
     }
 
-    /* Drawer styles */
     .drawer {
       position: absolute;
       top: 0;
@@ -95,7 +93,9 @@
       flex-direction: column;
     }
 
-    .drawer.open { transform: translateX(0); }
+    .drawer.open {
+      transform: translateX(0);
+    }
 
     .drawer-header {
       padding: 10px 16px;
@@ -113,22 +113,20 @@
       overflow-y: auto;
     }
 
-    /* Optional: dark mode */
     @media (prefers-color-scheme: dark) {
       #controls, #disclaimer, .legend {
-        background: rgba(30,30,30,0.95);
+        background: rgba(30, 30, 30, 0.95);
         color: #f1f1f1;
       }
-      .info{ color: #929292; }
-      .drawer { background: rgba(30,30,30,0.95); color:#f1f1f1; }
-      .drawer-header { background: #222; border-bottom-color: #444; }
+      .info {
+        color: #929292;
+      }
     }
   </style>
 </head>
 <body>
 
 <div id="controls">
-  <h1>Olmsted Incident Map</h1>
   <label>From: <input type="date" id="startDate"></label>
   <label>To: <input type="date" id="endDate"></label>
 
@@ -173,7 +171,7 @@
   const ZOOM = 11;
 
   const streetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' });
-  const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:"abcd", maxZoom:19 });
+  const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>', subdomains: "abcd", maxZoom: 19});
   const satelliteTiles = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap' });
 
   const map = L.map('map', { layers: [streetTiles] }).setView(CENTER, ZOOM);
@@ -182,6 +180,35 @@
   let rawData = [];
   let normData = [];
   let charts = {};
+
+  const PALETTE = ["#D7D7D9","#638C45","#D9C0A3","#A66B38","#401201"];
+  const ICONS = {
+    "accident": "fa-car-burst",
+    "accident injury": "fa-ambulance",
+    "alarm": "fa-bell",
+    "animal": "fa-paw",
+    "app order": "fa-mobile-screen",
+    "assist": "fa-hands-helping",
+    "assist fd": "fa-fire-extinguisher",
+    "community service": "fa-people-group",
+    "damage to property": "fa-house-crack",
+    "death investigation": "fa-cross",
+    "drugs - paraphernalia": "fa-capsules",
+    "escape": "fa-person-running",
+    "escort": "fa-shield-halved",
+    "medical": "fa-stethoscope",
+    "new call": "fa-bolt",
+    "paper service": "fa-file-signature",
+    "parking violation": "fa-square-parking",
+    "person in crisis": "fa-triangle-exclamation",
+    "probation check": "fa-id-card",
+    "project lifesaver": "fa-satellite-dish",
+    "suspicious circumstance": "fa-eye",
+    "traffic assist - complaint": "fa-road",
+    "traffic enforcement": "fa-gauge-high",
+    "traffic stop": "fa-stop",
+    "warrant": "fa-gavel"
+  };
 
   function pick(o, keys){
     for(const k of keys){
@@ -246,17 +273,14 @@
     </div>`;
   }
 
-  // New color palette
-  const PALETTE = ["#D7D7D9","#638C45","#D9C0A3","#A66B38","#401201"];
-
   function iconForType(type) {
     const t = (type || '').toLowerCase();
-    // assign a color based on hash of type to palette
-    const index = Math.abs([...t].reduce((sum,c)=>sum + c.charCodeAt(0),0)) % PALETTE.length;
+    let iconClass = "fa-map-marker-alt";
+    if(ICONS[t]) iconClass = ICONS[t];
+    const index = Math.abs([...t].reduce((sum,c)=>sum+c.charCodeAt(0),0)) % PALETTE.length;
     const color = PALETTE[index];
-
     return L.divIcon({
-      html: `<i class="fa fa-map-marker-alt fa-icon" style="color:${color}"></i>`,
+      html: `<i class="fa ${iconClass} fa-icon" style="color:${color}"></i>`,
       className: "",
       iconSize: [24, 24],
       iconAnchor: [12, 24]
@@ -297,17 +321,24 @@
     updateCharts(filtered);
   }
 
-  function addLegend(map){
+  function addLegend(map) {
     const legend = L.control({ position: "bottomleft" });
     legend.onAdd = function () {
       const div = L.DomUtil.create("div", "legend");
       div.innerHTML = `<h4>Incident Types</h4>`;
-      const types = Array.from(new Set(normData.map(d=>d.type).filter(Boolean))).sort();
-      types.forEach((t,i)=>{
+      Object.entries(ICONS).forEach(([key, icon], i) => {
         const color = PALETTE[i % PALETTE.length];
-        div.innerHTML += `<div><i class="fa fa-map-marker-alt" style="color:${color}"></i> <span>${t}</span></div>`;
+        div.innerHTML += `
+          <div class="legend-item">
+            <i class="fa ${icon}" style="color:${color}"></i>
+            <span>${key}</span>
+          </div>`;
       });
-      div.innerHTML += `<div><i class="fa fa-map-marker-alt" style="color:#6c757d"></i> <span>Other / Unknown</span></div>`;
+      div.innerHTML += `
+        <div class="legend-item">
+          <i class="fa fa-map-marker-alt" style="color:#6c757d"></i>
+          <span>Other / Unknown</span>
+        </div>`;
       return div;
     };
     legend.addTo(map);
@@ -321,45 +352,66 @@
     const dayCount = new Array(7).fill(0);
     const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
-    data.forEach(c=>{
+    data.forEach(c => {
       const type = c.type || "Unknown";
       typeCount[type] = (typeCount[type] || 0) + 1;
       const d = new Date(c.date);
-      if(!isNaN(d)) {
+      if (!isNaN(d)) {
         hourCount[d.getHours()]++;
         dayCount[d.getDay()]++;
       }
     });
 
-    const topTypes = Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const topTypes = Object.entries(typeCount)
+      .sort((a,b) => b[1]-a[1])
+      .slice(0,10);
 
     const ctxType = document.getElementById("chart1");
     const ctxHour = document.getElementById("chart2");
     const ctxDay = document.getElementById("chart3");
 
-    if(charts.type) charts.type.destroy();
-    if(charts.hour) charts.hour.destroy();
-    if(charts.day) charts.day.destroy();
+    if (charts.type) charts.type.destroy();
+    if (charts.hour) charts.hour.destroy();
+    if (charts.day) charts.day.destroy();
 
-    charts.type = new Chart(ctxType,{
-      type:"bar",
-      data:{
-        labels: topTypes.map(t=>t[0]),
-        datasets:[{label:"Incidents",data:topTypes.map(t=>t[1]),backgroundColor: PALETTE}]
+    charts.type = new Chart(ctxType, {
+      type: "bar",
+      data: {
+        labels: topTypes.map(t => t[0]),
+        datasets: [{
+          label: "Incidents",
+          data: topTypes.map(t => t[1]),
+          backgroundColor: "#dc3545"
+        }]
       },
-      options:{plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}}}
+      options: { plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}}}
     });
 
-    charts.hour = new Chart(ctxHour,{
-      type:"line",
-      data:{labels:[...Array(24).keys()],datasets:[{label:"Incidents by Hour",data:hourCount,borderColor:"#401201",tension:0.3}]},
-      options:{plugins:{legend:{display:false}}}
+    charts.hour = new Chart(ctxHour, {
+      type: "line",
+      data: {
+        labels: [...Array(24).keys()],
+        datasets: [{
+          label: "Incidents by Hour",
+          data: hourCount,
+          borderColor: "#007bff",
+          tension: 0.3
+        }]
+      },
+      options: { plugins:{legend:{display:false}}}
     });
 
-    charts.day = new Chart(ctxDay,{
-      type:"bar",
-      data:{labels:days,datasets:[{label:"Incidents by Day",data:dayCount,backgroundColor:"#638C45"}]},
-      options:{plugins:{legend:{display:false}}}
+    charts.day = new Chart(ctxDay, {
+      type: "bar",
+      data: {
+        labels: days,
+        datasets: [{
+          label: "Incidents by Day",
+          data: dayCount,
+          backgroundColor: "#198754"
+        }]
+      },
+      options: { plugins:{legend:{display:false}}}
     });
   }
 
@@ -368,39 +420,38 @@
   const toggle = document.getElementById("chartToggle");
   const closeBtn = document.getElementById("closeDrawer");
 
-  function toggleDrawer(open){
-    if(open===undefined) drawer.classList.toggle("open");
+  function toggleDrawer(open) {
+    if (open === undefined) drawer.classList.toggle("open");
     else drawer.classList.toggle("open", open);
     const icon = toggle.querySelector("i");
-    if(drawer.classList.contains("open")){
-      icon.classList.replace("fa-chart-bar","fa-angle-right");
-      setTimeout(()=>updateCharts(normData),100);
+    if (drawer.classList.contains("open")) {
+      icon.classList.replace("fa-chart-bar", "fa-angle-right");
+      setTimeout(() => updateCharts(normData), 100);
     } else {
-      icon.classList.replace("fa-angle-right","fa-chart-bar");
+      icon.classList.replace("fa-angle-right", "fa-chart-bar");
     }
   }
 
-  toggle.addEventListener("click",()=>toggleDrawer());
-  closeBtn.addEventListener("click",()=>toggleDrawer(false));
+  toggle.addEventListener("click", () => toggleDrawer());
+  closeBtn.addEventListener("click", () => toggleDrawer(false));
 
-  // Map style toggle
   const mapToggle = document.getElementById("mapToggle");
   const styles = [
-    { name:"Street", layer:streetTiles },
-    { name:"Dark", layer:darkTiles },
-    { name:"Satellite", layer:satelliteTiles }
+    { name: "Street", layer: streetTiles },
+    { name: "Dark", layer: darkTiles },
+    { name: "Satellite", layer: satelliteTiles }
   ];
   let currentStyle = 0;
 
-  function setMapStyle(index){
-    map.eachLayer(layer=>map.removeLayer(layer));
+  function setMapStyle(index) {
+    map.eachLayer(layer => map.removeLayer(layer));
     styles[index].layer.addTo(map);
     markersLayer.addTo(map);
-    mapToggle.textContent = "Map: "+styles[index].name;
+    mapToggle.textContent = "Map: " + styles[index].name;
   }
 
-  mapToggle.addEventListener("click",()=>{
-    currentStyle = (currentStyle+1) % styles.length;
+  mapToggle.addEventListener("click", () => {
+    currentStyle = (currentStyle + 1) % styles.length;
     setMapStyle(currentStyle);
   });
 
