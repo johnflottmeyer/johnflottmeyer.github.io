@@ -36,11 +36,65 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
 
 /* Chart drawer */
 #chartToggle{ background-color:#FFF; padding: 5px; position: absolute; right: 10px; top: 70px; z-index: 1000; }
-.drawer { position: absolute; top: 0; right: 0; width: 350px; height: 100%; backdrop-filter: blur(10px); box-shadow: -4px 0 10px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; z-index:1001; display:flex; flex-direction:column; }
-.drawer.open { transform: translateX(0); }
-.drawer-header { padding:10px 16px; background:#f7f7f7; border-bottom:1px solid #ddd; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
-.drawer-content { flex:1; padding:16px; overflow-y:auto; }
-.drawer-content canvas { width: 100% !important; height: 200px !important; margin-bottom:25px; }
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* responsive columns */
+  grid-auto-rows: minmax(350px, auto);
+  gap: 20px;
+  padding: 80px 20px 20px 20px; /* top padding for header */
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 20px;
+  background: #f7f7f7;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2100;
+}
+
+.drawer-content {
+  display: contents; /* grid handles layout of canvases */
+}
+
+.drawer canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Mobile: switch to single column for narrow screens */
+@media (max-width: 600px) {
+  .drawer {
+    grid-template-columns: 1fr; /* single column */
+    grid-auto-rows: minmax(300px, auto);
+    padding-top: 70px;
+  }
+
+  .drawer canvas {
+    min-height: 300px;
+  }
+}
 
 @media (prefers-color-scheme: dark) {
   #controls { background-color:#638C45; color:#f1f1f1; }
@@ -362,10 +416,37 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
 }
 
   // Drawer toggle
-  const drawer=document.getElementById("drawer"), toggle=document.getElementById("chartToggle"), closeBtn=document.getElementById("closeDrawer");
-  function toggleDrawer(open){ if(open===undefined) drawer.classList.toggle("open"); else drawer.classList.toggle("open",open); const icon=toggle.querySelector("i"); if(drawer.classList.contains("open")){ icon.classList.replace("fa-chart-bar","fa-angle-right"); setTimeout(()=>updateCharts(normData),100);} else{ icon.classList.replace("fa-angle-right","fa-chart-bar"); } }
-  toggle.addEventListener("click",()=>toggleDrawer());
-  closeBtn.addEventListener("click",()=>toggleDrawer(false));
+  const drawer = document.getElementById("drawer");
+  const toggle = document.getElementById("chartToggle");
+  const closeBtn = document.getElementById("closeDrawer");
+
+  function toggleDrawer(open) {
+    const isOpen = drawer.classList.contains("open");
+    const shouldOpen = open === undefined ? !isOpen : open;
+
+    drawer.classList.toggle("open", shouldOpen);
+
+    // Change toggle icon
+    const icon = toggle.querySelector("i");
+    if (shouldOpen) {
+      icon.classList.replace("fa-chart-bar", "fa-angle-right");
+      // Update charts after a short delay to ensure layout is correct
+      setTimeout(() => updateCharts(normData), 150);
+    } else {
+      icon.classList.replace("fa-angle-right", "fa-chart-bar");
+    }
+  }
+
+  toggle.addEventListener("click", () => toggleDrawer());
+  closeBtn.addEventListener("click", () => toggleDrawer(false));
+
+  // Optional: Close drawer on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && drawer.classList.contains("open")) {
+      toggleDrawer(false);
+    }
+  });
+
 
   // Map style toggle
   const mapToggleBtn=document.getElementById("mapToggle");
