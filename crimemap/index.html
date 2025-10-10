@@ -1,203 +1,240 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Crime Map & Charts</title>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <meta charset="utf-8" />
+  <title>Crime Map with Legend & Disclaimer</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      margin: 0;
-      background: #f8f9fa;
-      color: #222;
+    body { margin:0; font-family: Arial, sans-serif; }
+    #controls {
+      padding:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      background:#f6f7f8;
+      border-bottom:1px solid #ccc;
     }
-    #map {
-      height: 500px;
+    #controls label { font-size: 14px; }
+    #controls select,input[type="date"],button {
+      padding:5px 8px;
+      border-radius:4px;
+      border:1px solid #ccc;
+      font-size:14px;
+    }
+    #map { height: calc(100vh - 100px); width:100%; }
+    .info { font-size:13px; color:#555; }
+    .fa-icon { font-size: 20px; }
+    .legend {
+      background:white;
+      padding:8px;
+      border-radius:6px;
+      box-shadow:0 0 15px rgba(0,0,0,0.2);
+      font-size:14px;
+    }
+    .legend i { margin-right:6px; }
+    #disclaimer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
       width: 100%;
-    }
-    .controls {
-      padding: 10px;
-      background: #fff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    canvas {
-      max-width: 100%;
-      margin: 20px auto;
-      display: block;
-    }
-    .chart-container {
-      background: #fff;
-      margin: 20px;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    footer {
+      background: rgba(255,255,255,0.95);
+      padding: 8px 12px;
+      font-size: 13px;
       text-align: center;
-      padding: 15px;
-      font-size: 0.9em;
-      color: #666;
+      border-top: 1px solid #ccc;
+      color: #333;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
 
-  <div class="controls">
-    <form id="filterForm">
-      <label>Date range:</label>
-      <input type="date" id="startDate"> –
-      <input type="date" id="endDate">
-      <label>Sort by:</label>
-      <select id="sortBy">
-        <option value="time">Crime Time</option>
-        <option value="type">Crime Type</option>
-      </select>
-      <button type="submit">Apply</button>
-    </form>
-  </div>
+<div id="controls">
+  <label>From: <input type="date" id="startDate"></label>
+  <label>To: <input type="date" id="endDate"></label>
 
-  <div id="map"></div>
+  <label>Type:
+    <select id="crimeType"><option value="">All</option></select>
+  </label>
 
-  <div class="chart-container">
-    <h3>Most Common Incident Types</h3>
-    <canvas id="crimeTypeChart"></canvas>
-  </div>
+  <button id="filterBtn">Apply</button>
+  <button id="resetBtn">Reset</button>
 
-  <div class="chart-container">
-    <h3>Incidents by Hour</h3>
-    <canvas id="crimeHourChart"></canvas>
-  </div>
+  <span class="info" id="status">Loading…</span>
+</div>
 
-  <div class="chart-container">
-    <h3>Incidents by Day of Week</h3>
-    <canvas id="crimeDayChart"></canvas>
-  </div>
+<div id="map"></div>
 
-  <footer>
-    Disclaimer: These are <strong>reported incidents</strong>, not necessarily confirmed crimes.
-  </footer>
+<div id="disclaimer">
+  ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
+</div>
 
-  <script>
-    const map = L.map('map').setView([39.7392, -104.9903], 12);
+<script>
+(async function(){
+  const DATA_URL = "https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
+  const CENTER = [44.0221, -92.4630];
+  const ZOOM = 11;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+  let map = L.map('map').setView(CENTER, ZOOM);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
 
-    let allCrimes = [];
+  let markersLayer = L.layerGroup().addTo(map);
+  let rawData = [];
+  let normData = [];
 
-    async function fetchCrimeData() {
-      try {
-        const response = await fetch(
-          'https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec'
-        );
-        const data = await response.json();
-        allCrimes = Array.isArray(data) ? data : (data.records || []);
-        console.log('Loaded crimes:', allCrimes.length);
-        plotCrimes(allCrimes);
-        updateCharts(allCrimes);
-      } catch (err) {
-        console.error('Error loading data', err);
-      }
+  function pick(o, keys){
+    for(const k of keys){
+      if (o && o[k] !== undefined && o[k] !== null && String(o[k]).trim() !== "") return o[k];
     }
+    return "";
+  }
 
+  function normalize(rec){
+    const raw = rec || {};
+    const dateStr = pick(raw, ['createDateTime','CreateDateTime','DateTimeIncident','date','datetime']);
+    let date = dateStr ? new Date(dateStr) : null;
+    const lat = parseFloat(pick(raw, ['lat','Lat','latitude','Latitude']));
+    const lng = parseFloat(pick(raw, ['long','lng','lon','Longitude']));
+    return {
+      raw,
+      date,
+      dateRaw: dateStr || "",
+      lat: (!isNaN(lat) ? lat : null),
+      lng: (!isNaN(lng) ? lng : null),
+      type: pick(raw, ['incidentType','IncidentType','crime','Crime','type','Type','Incident']),
+      address: pick(raw, ['FullAddress','address','Address','location','Location']),
+      city: pick(raw, ['city','City','venue','Venue']),
+      zip: pick(raw, ['zip','Zip','postal','Postal'])
+    };
+  }
 
-    function plotCrimes(data) {
-      data.forEach(crime => {
-        if (crime.lat && crime.lng) {
-          const icon = L.divIcon({
-            html: '<i class="fa-solid fa-triangle-exclamation" style="color:red;font-size:16px;"></i>',
-            className: 'crime-icon',
-            iconSize: [16,16]
-          });
-          L.marker([crime.lat, crime.lng], { icon })
-            .addTo(map)
-            .bindPopup(`<strong>${crime.type}</strong><br>${crime.date || ''}`);
-        }
-      });
+  async function loadData(){
+    document.getElementById('status').textContent = 'Loading data…';
+    try {
+      const res = await fetch(DATA_URL);
+      if(!res.ok) throw new Error('Fetch failed: ' + res.status);
+      rawData = await res.json();
+      if (rawData && rawData.records) rawData = rawData.records;
+      if (!Array.isArray(rawData)) { console.error('Bad feed:', rawData); return; }
+      normData = rawData.map(normalize);
+      populateTypes();
+      renderMarkers(normData);
+      addLegend(map);
+      document.getElementById('status').textContent = `Loaded ${normData.length} records`;
+    } catch (err) {
+      console.error(err);
+      document.getElementById('status').textContent = 'Error loading feed';
     }
+  }
 
-    let crimeTypeChart, crimeHourChart, crimeDayChart;
+  function populateTypes(){
+    const types = Array.from(new Set(normData.map(d=>d.type).filter(Boolean))).sort();
+    const select = document.getElementById('crimeType');
+    select.querySelectorAll('option:not([value=""])').forEach(n=>n.remove());
+    types.forEach(t => { const opt = document.createElement('option'); opt.value = t; opt.textContent = t; select.appendChild(opt); });
+  }
 
-    function updateCharts(data) {
-      const typeCount = {};
-      const hourCount = new Array(24).fill(0);
-      const dayCount = new Array(7).fill(0);
-      const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  function popupHtml(d){
+    return `<div style="font-size:13px;">
+      <strong>${d.type || 'Incident'}</strong><br/>
+      ${d.address || ''}<br/>
+      ${d.city || ''} ${d.zip || ''}<br/>
+      <small>${d.dateRaw || ''}</small>
+    </div>`;
+  }
 
-      data.forEach(c => {
-        const type = c.type || "Unknown";
-        typeCount[type] = (typeCount[type] || 0) + 1;
-        const d = new Date(c.date);
-        if (!isNaN(d)) {
-          hourCount[d.getHours()]++;
-          dayCount[d.getDay()]++;
-        }
-      });
+  function iconForType(type){
+    const t = (type||'').toLowerCase();
+    let iconClass = "fa-map-marker-alt";
+    let color = "red";
+    if(t.includes("traffic")) { iconClass = "fa-car"; color = "blue"; }
+    if(t.includes("burglary")) { iconClass = "fa-user-secret"; color = "orange"; }
+    if(t.includes("theft")) { iconClass = "fa-hand-paper"; color = "purple"; }
+    if(t.includes("drugs")) { iconClass = "fa-prescription-bottle-medical"; color = "green"; }
+    if(t.includes("assist")) { iconClass = "fa-hands-helping"; color = "cadetblue"; }
+    if(t.includes("crisis")) { iconClass = "fa-triangle-exclamation"; color = "yellow"; }
 
-      const topTypes = Object.entries(typeCount)
-        .sort((a,b) => b[1]-a[1])
-        .slice(0,10);
+    return L.divIcon({
+      html: `<i class="fa ${iconClass} fa-icon" style="color:${color}"></i>`,
+      className: "",
+      iconSize: [24, 24],
+      iconAnchor: [12, 24]
+    });
+  }
 
-      const ctxType = document.getElementById("crimeTypeChart");
-      const ctxHour = document.getElementById("crimeHourChart");
-      const ctxDay = document.getElementById("crimeDayChart");
+  function renderMarkers(data){
+    markersLayer.clearLayers();
+    let count = 0;
+    data.forEach(d=>{
+      if(d.lat == null || d.lng == null) return;
+      const marker = L.marker([d.lat,d.lng], {icon:iconForType(d.type)})
+        .bindPopup(popupHtml(d));
+      markersLayer.addLayer(marker);
+      count++;
+    });
+    document.getElementById('status').textContent = `Showing ${count} of ${normData.length} records`;
+  }
 
-      if (crimeTypeChart) crimeTypeChart.destroy();
-      if (crimeHourChart) crimeHourChart.destroy();
-      if (crimeDayChart) crimeDayChart.destroy();
+  function applyFilters(){
+    const startVal = document.getElementById('startDate').value;
+    const endVal = document.getElementById('endDate').value;
+    const typeVal = document.getElementById('crimeType').value;
+    const start = startVal ? new Date(startVal+'T00:00:00') : null;
+    const end = endVal ? new Date(endVal+'T23:59:59') : null;
 
-      crimeTypeChart = new Chart(ctxType, {
-        type: "bar",
-        data: {
-          labels: topTypes.map(t => t[0]),
-          datasets: [{
-            label: "Incidents",
-            data: topTypes.map(t => t[1]),
-            backgroundColor: "#dc3545"
-          }]
-        }
-      });
+    const filtered = normData.filter(d=>{
+      if(d.lat == null || d.lng == null) return false;
+      if(start && (!d.date || d.date<start)) return false;
+      if(end && (!d.date || d.date>end)) return false;
+      if(typeVal && (!d.type || d.type.toLowerCase()!==typeVal.toLowerCase())) return false;
+      return true;
+    });
+    renderMarkers(filtered);
+  }
 
-      crimeHourChart = new Chart(ctxHour, {
-        type: "line",
-        data: {
-          labels: [...Array(24).keys()],
-          datasets: [{
-            label: "Incidents by Hour",
-            data: hourCount,
-            borderColor: "#007bff",
-            tension: 0.3
-          }]
-        }
-      });
+  function addLegend(map) {
+    const legend = L.control({position: 'bottomright'});
+    legend.onAdd = function () {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML += "<strong>Crime Types</strong><br/>";
+        const types = [
+            {label: "Traffic", icon: "fa-car", color: "blue"},
+            {label: "Burglary", icon: "fa-user-secret", color: "orange"},
+            {label: "Theft", icon: "fa-hand-paper", color: "purple"},
+            {label: "Drugs", icon: "fa-prescription-bottle-medical", color: "green"},
+            {label: "Assist", icon: "fa-hands-helping", color: "cadetblue"},
+            {label: "Crisis", icon: "fa-triangle-exclamation", color: "yellow"},
+            {label: "Other", icon: "fa-map-marker-alt", color: "red"}
+        ];
+        types.forEach(type => {
+            div.innerHTML += `<i class="fa ${type.icon}" style="color:${type.color}"></i> ${type.label}<br/>`;
+        });
+        return div;
+    };
+    legend.addTo(map);
+  }
 
-      crimeDayChart = new Chart(ctxDay, {
-        type: "bar",
-        data: {
-          labels: days,
-          datasets: [{
-            label: "Incidents by Day",
-            data: dayCount,
-            backgroundColor: "#198754"
-          }]
-        }
-      });
-    }
+  document.getElementById('filterBtn').addEventListener('click', applyFilters);
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    document.getElementById('startDate').value='';
+    document.getElementById('endDate').value='';
+    document.getElementById('crimeType').value='';
+    renderMarkers(normData);
+  });
 
-    fetchCrimeData();
-  </script>
+  await loadData();
+})();
+</script>
 </body>
 </html>
