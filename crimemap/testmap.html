@@ -1,39 +1,100 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Sheriff Logs Map Test</title>
-</head>
-<body>
-  <h1>Sheriff Logs</h1>
-  <ul id="incidentList"></ul>
+  <head>
+    <meta charset="utf-8">
+    <title>Olmsted County Sheriff's Daily Activity Map</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
 
-  <script>
-    async function loadSheriffData() {
-      const feedUrl = "https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
+    <script>
+      const DATA_URL = "https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
+      let map, markers = [];
 
-      try {
-        const response = await fetch(feedUrl);
+      async function fetchData() {
+        const response = await fetch(DATA_URL);
         const data = await response.json();
+        return data.records || data; // handles both formats
+      }
 
-        console.log("Fetched data:", data);
+      function getIcon(incidentType) {
+        const icons = {
+          "Traffic Stop": "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+          "Burglary": "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+          "Person in Crisis": "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
+          "Drugs - Paraphernalia": "https://maps.google.com/mapfiles/ms/icons/purple-dot.png",
+          "Assist": "https://maps.google.com/mapfiles/ms/icons/orange-dot.png",
+          "default": "https://maps.google.com/mapfiles/ms/icons/green-dot.png"
+        };
+        return icons[incidentType] || icons["default"];
+      }
 
-        const list = document.getElementById("incidentList");
-        list.innerHTML = "";
+      function clearMarkers() {
+        for (const m of markers) {
+          m.setMap(null);
+        }
+        markers = [];
+      }
+
+      async function initMap() {
+        if (!map) {
+          map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 44.0221, lng: -92.4630 }, // Rochester, MN
+            zoom: 11
+          });
+        }
+
+        const data = await fetchData();
+        clearMarkers();
 
         data.forEach(item => {
-          const li = document.createElement("li");
-          li.innerHTML = `<b>${item.datetime}</b> — ${item.incidentType} at <a href="${item.mapLink}" target="_blank">${item.address}</a> (${item.city})`;
-          list.appendChild(li);
+          if (!item.lat || !item.long) return; // skip missing coords
+
+          const position = {
+            lat: parseFloat(item.lat),
+            lng: parseFloat(item.long)
+          };
+
+          const marker = new google.maps.Marker({
+            position,
+            map,
+            icon: getIcon(item.incidentType),
+            title: `${item.datetime} - ${item.incidentType}`
+          });
+
+          const info = new google.maps.InfoWindow({
+            content: `
+              <strong>${item.incidentType}</strong><br>
+              ${item.fullAddress || ""}<br>
+              ${item.city || ""} ${item.zip || ""}<br>
+              <small>${item.datetime}</small>
+            `
+          });
+
+          marker.addListener("click", () => info.open(map, marker));
+          markers.push(marker);
         });
 
-      } catch (error) {
-        console.error("Error fetching sheriff logs:", error);
-        document.body.innerHTML += `<p style="color:red;">Error loading data. Check console for details.</p>`;
+        console.log(`Loaded ${markers.length} markers`);
       }
-    }
 
-    loadSheriffData();
-  </script>
-</body>
+      // refresh every 5 minutes
+      setInterval(initMap, 5 * 60 * 1000);
+    </script>
+
+    <script async
+      src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+    </script>
+  </body>
 </html>
