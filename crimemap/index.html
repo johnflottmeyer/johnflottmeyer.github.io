@@ -9,16 +9,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- MarkerCluster -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Font Awesome -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
    
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,25 +22,28 @@
   <style>
     body { margin:0; font-family: "Roboto", Arial, sans-serif; }
     .logo{ font-family: "Doto", Arial, sans-serif; margin: 0 30px 0 10px; }
-    #controls { padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#f6f7f8; border-bottom:1px solid #ccc; z-index: 1001; position: relative; }
-    #controls select,input[type="date"],button { padding:5px 8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
+    #controls { padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#f6f7f8; border-bottom:1px solid #ccc; z-index:1001; position:relative; }
+    #controls label { font-size: 14px; }
+    #controls select,input[type="date"],input[type="time"],button { padding:5px 8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
     #map { height: calc(100vh - 100px); width:100%; position:relative; }
     .info { font-size:13px; color:#555; }
-    .fa-icon { font-size: 20px; background-color: rgba(255,255,255,0.5); border:1px solid #FFF; padding: 5px; border-radius: 60%; }
+    .fa-icon { font-size: 20px; background-color: rgba(255,255,255,0.5); border:1px solid #FFF; padding: 5px; border-radius: 60%; color: #7C2C2C; }
     .legend { background:white; padding:8px; border-radius:6px; box-shadow:0 0 15px rgba(0,0,0,0.2); font-size:14px; }
     .legend i { margin-right:6px; }
     .legend h4 { margin-top: 0; }
     #disclaimer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); padding: 8px 12px; font-size: 13px; text-align: center; border-top: 1px solid #ccc; color: #333; z-index: 1000; }
 
+    /* Chart drawer */
     #chartToggle{ background-color:#FFF; padding: 5px; position: absolute; right: 10px; top: 70px; z-index: 1000; }
-    .drawer { position: absolute; top: 0; right: 0; width: 350px; height: 100%; backdrop-filter: blur(10px); box-shadow: -4px 0 10px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; z-index: 1001; display: flex; flex-direction: column; }
+    .drawer { position: absolute; top: 0; right: 0; width: 350px; height: 100%; backdrop-filter: blur(10px); box-shadow: -4px 0 10px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; z-index:1001; display:flex; flex-direction:column; }
     .drawer.open { transform: translateX(0); }
-    .drawer-header { padding: 10px 16px; background: #f7f7f7; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-    .drawer-content { flex: 1; padding: 16px; overflow-y: auto; }
+    .drawer-header { padding:10px 16px; background:#f7f7f7; border-bottom:1px solid #ddd; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
+    .drawer-content { flex:1; padding:16px; overflow-y:auto; }
+
     @media (prefers-color-scheme: dark) {
-      #controls { background-color: #638C45; color: #f1f1f1; }
-      .legend{ background-color: #D9C0A3; }
-      #disclaimer{ background-color: #D7D7D9; }
+      #controls { background-color:#638C45; color:#f1f1f1; }
+      .legend{ background-color:#D9C0A3; }
+      #disclaimer{ background-color:#D7D7D9; }
       .info { color: #929292; }
     }
   </style>
@@ -56,16 +54,15 @@
   <h1 class="logo">Olmsted Incident Report</h1>
   <label>From: <input type="date" id="startDate"></label>
   <label>To: <input type="date" id="endDate"></label>
+  <label>From Time: <input type="time" id="startTime" value="00:00"></label>
+  <label>To Time: <input type="time" id="endTime" value="23:59"></label>
 
-  <label>Type:
-    <select id="crimeType"><option value="">All</option></select>
-  </label>
+  <label>Type: <select id="crimeType"><option value="">All</option></select></label>
 
   <button id="filterBtn">Apply</button>
   <button id="resetBtn">Reset</button>
 
   <button id="mapToggle">Map: Street</button>
-
   <span class="info" id="status">Loading…</span>
 </div>
 
@@ -98,19 +95,13 @@
   const ZOOM = 11;
 
   const streetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' });
-  const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>', subdomains: "abcd", maxZoom: 19});
+  const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:"abcd", maxZoom:19});
   const satelliteTiles = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap' });
 
   const map = L.map('map', { layers: [streetTiles] }).setView(CENTER, ZOOM);
-
-  // --- MarkerCluster integration ---
-  let markersLayer = L.markerClusterGroup({ chunkedLoading:true, showCoverageOnHover:false });
-  map.addLayer(markersLayer);
-
-  let rawData = [];
-  let normData = [];
-  let charts = {};
-  const PALETTE = ["#401201"];
+  let markersLayer = L.layerGroup().addTo(map);
+  let rawData = [], normData = [], charts = {};
+  const PALETTE = ["#7C2C2C"];
   const ICONS = {
     "accident": "fa-car-burst",
     "accident injury": "fa-ambulance",
@@ -139,200 +130,150 @@
     "warrant": "fa-gavel"
   };
 
-  function pick(o, keys){ for(const k of keys){ if (o && o[k] !== undefined && o[k] !== null && String(o[k]).trim() !== "") return o[k]; } return ""; }
+  function pick(o, keys){ for(const k of keys) if(o && o[k]!==undefined && o[k]!==null && String(o[k]).trim()!=="") return o[k]; return ""; }
   function normalize(rec){
-    const raw = rec || {};
+    const raw = rec||{};
     const dateStr = pick(raw, ['createDateTime','CreateDateTime','DateTimeIncident','date','datetime']);
-    let date = dateStr ? new Date(dateStr) : null;
-    const lat = parseFloat(pick(raw, ['lat','Lat','latitude','Latitude']));
-    const lng = parseFloat(pick(raw, ['long','lng','lon','Longitude']));
+    let date = dateStr?new Date(dateStr):null;
+    const lat=parseFloat(pick(raw,['lat','Lat','latitude','Latitude']));
+    const lng=parseFloat(pick(raw,['long','lng','lon','Longitude']));
     return {
-      raw,
-      date,
-      dateRaw: dateStr || "",
-      lat: (!isNaN(lat) ? lat : null),
-      lng: (!isNaN(lng) ? lng : null),
-      type: pick(raw, ['incidentType','IncidentType','crime','Crime','type','Type','Incident']),
-      address: pick(raw, ['FullAddress','address','Address','location','Location']),
-      city: pick(raw, ['city','City','venue','Venue']),
-      zip: pick(raw, ['zip','Zip','postal','Postal'])
+      raw, date, dateRaw: dateStr||"", lat:(!isNaN(lat)?lat:null), lng:(!isNaN(lng)?lng:null),
+      type: pick(raw,['incidentType','IncidentType','crime','Crime','type','Type','Incident']),
+      address: pick(raw,['FullAddress','address','Address','location','Location']),
+      city: pick(raw,['city','City','venue','Venue']),
+      zip: pick(raw,['zip','Zip','postal','Postal'])
     };
   }
 
   async function loadData(){
-    document.getElementById('status').textContent = 'Loading data…';
+    document.getElementById('status').textContent='Loading data…';
     try {
       const res = await fetch(DATA_URL);
-      if(!res.ok) throw new Error('Fetch failed: ' + res.status);
+      if(!res.ok) throw new Error('Fetch failed: '+res.status);
       let data = await res.json();
-      rawData = Array.isArray(data) ? data : (data.records || []);
-      if (!Array.isArray(rawData)) throw new Error('Unexpected data format');
+      rawData = Array.isArray(data)?data:(data.records||[]);
+      if(!Array.isArray(rawData)) throw new Error('Unexpected data format');
+
       normData = rawData.map(normalize);
       populateTypes();
       renderMarkers(normData);
       addLegend(map);
       updateCharts(normData);
-      document.getElementById('status').textContent = `Loaded ${normData.length} records`;
-    } catch (err) {
-      console.error('Error loading data:', err);
-      document.getElementById('status').textContent = 'Error loading feed';
-    }
+      document.getElementById('status').textContent=`Loaded ${normData.length} records`;
+    } catch(err){ console.error('Error loading data:',err); document.getElementById('status').textContent='Error loading feed'; }
   }
 
   function populateTypes(){
     const types = Array.from(new Set(normData.map(d=>d.type).filter(Boolean))).sort();
     const select = document.getElementById('crimeType');
     select.querySelectorAll('option:not([value=""])').forEach(n=>n.remove());
-    types.forEach(t => { const opt = document.createElement('option'); opt.value = t; opt.textContent = t; select.appendChild(opt); });
+    types.forEach(t=>{ const opt=document.createElement('option'); opt.value=t; opt.textContent=t; select.appendChild(opt); });
   }
 
-  function popupHtml(d){
-    return `<div style="font-size:13px;">
-      <strong>${d.type || 'Incident'}</strong><br/>
-      ${d.address || ''}<br/>
-      ${d.city || ''} ${d.zip || ''}<br/>
-      <small>${d.dateRaw || ''}</small>
-    </div>`;
-  }
-
-  function iconForType(type) {
-    const t = (type || '').toLowerCase();
-    let iconClass = "fa-map-marker-alt";
-    if(ICONS[t]) iconClass = ICONS[t];
-    const index = Math.abs([...t].reduce((sum,c)=>sum+c.charCodeAt(0),0)) % PALETTE.length;
-    const color = PALETTE[index];
-    return L.divIcon({
-      html: `<i class="fa ${iconClass} fa-icon" style="color:${color}"></i>`,
-      className: "",
-      iconSize: [24, 24],
-      iconAnchor: [12, 24]
-    });
+  function popupHtml(d){ return `<div style="font-size:13px;"><strong>${d.type||'Incident'}</strong><br/>${d.address||''}<br/>${d.city||''} ${d.zip||''}<br/><small>${d.dateRaw||''}</small></div>`; }
+  function iconForType(type){
+    const t=(type||'').toLowerCase();
+    let iconClass="fa-map-marker-alt";
+    if(ICONS[t]) iconClass=ICONS[t];
+    return L.divIcon({ html:`<i class="fa ${iconClass} fa-icon" style="color:${PALETTE[0]}"></i>`, className:"", iconSize:[24,24], iconAnchor:[12,24] });
   }
 
   function renderMarkers(data){
     markersLayer.clearLayers();
-    let count = 0;
-    const bounds = L.latLngBounds();
+    data.sort((a,b)=>a.date-b.date); // Sort by time
+    let count=0, bounds=L.latLngBounds();
     data.forEach(d=>{
-      if(d.lat == null || d.lng == null) return;
-      const marker = L.marker([d.lat,d.lng], {icon:iconForType(d.type)})
-        .bindPopup(popupHtml(d));
-      markersLayer.addLayer(marker);
-      bounds.extend([d.lat, d.lng]);
-      count++;
+      if(d.lat==null||d.lng==null) return;
+      const marker=L.marker([d.lat,d.lng],{icon:iconForType(d.type)}).bindPopup(popupHtml(d));
+      markersLayer.addLayer(marker); bounds.extend([d.lat,d.lng]); count++;
     });
-    if (count > 0) map.fitBounds(bounds);
-    document.getElementById('status').textContent = `Showing ${count} of ${normData.length} records`;
+    if(count>0) map.fitBounds(bounds);
+    document.getElementById('status').textContent=`Showing ${count} of ${normData.length} records`;
   }
 
   function applyFilters(){
-    const startVal = document.getElementById('startDate').value;
-    const endVal = document.getElementById('endDate').value;
-    const typeVal = document.getElementById('crimeType').value;
-    const start = startVal ? new Date(startVal+'T00:00:00') : null;
-    const end = endVal ? new Date(endVal+'T23:59:59') : null;
+    const startVal=document.getElementById('startDate').value;
+    const endVal=document.getElementById('endDate').value;
+    const startTimeVal=document.getElementById('startTime').value||"00:00";
+    const endTimeVal=document.getElementById('endTime').value||"23:59";
+    const typeVal=document.getElementById('crimeType').value;
 
-    const filtered = normData.filter(d=>{
-      if(d.lat == null || d.lng == null) return false;
-      if(start && (!d.date || d.date<start)) return false;
-      if(end && (!d.date || d.date>end)) return false;
+    const start=startVal?new Date(startVal+'T00:00:00'):null;
+    const end=endVal?new Date(endVal+'T23:59:59'):null;
+
+    const [startH,startM]=startTimeVal.split(':').map(Number);
+    const [endH,endM]=endTimeVal.split(':').map(Number);
+
+    const filtered=normData.filter(d=>{
+      if(d.lat==null||d.lng==null) return false;
+      if(start && (!d.date||d.date<start)) return false;
+      if(end && (!d.date||d.date>end)) return false;
+
+      if(d.date){
+        const h=d.date.getHours(), m=d.date.getMinutes();
+        const afterStart=h>startH||(h===startH && m>=startM);
+        const beforeEnd=h<endH||(h===endH && m<=endM);
+        if(!(afterStart && beforeEnd)) return false;
+      }
+
       if(typeVal && (!d.type || d.type.toLowerCase()!==typeVal.toLowerCase())) return false;
       return true;
     });
+
     renderMarkers(filtered);
     updateCharts(filtered);
   }
 
-  function addLegend(map) {
-    const legend = L.control({ position: "bottomleft" });
-    legend.onAdd = function () {
-      const div = L.DomUtil.create("div", "legend");
-      div.innerHTML = `<h4>Incident Types</h4>`;
-      Object.entries(ICONS).forEach(([key, icon], i) => {
-        const color = PALETTE[i % PALETTE.length];
-        div.innerHTML += `<div class="legend-item"><i class="fa ${icon}" style="color:${color}"></i> <span>${key}</span></div>`;
-      });
-      div.innerHTML += `<div class="legend-item"><i class="fa fa-map-marker-alt" style="color:#6c757d"></i> <span>Other / Unknown</span></div>`;
+  function addLegend(map){
+    const legend=L.control({ position:"bottomleft" });
+    legend.onAdd=function(){
+      const div=L.DomUtil.create("div","legend");
+      div.innerHTML="<h4>Incident Types</h4>";
+      Object.entries(ICONS).forEach(([key,icon],i)=>{ div.innerHTML+=`<div class="legend-item"><i class="fa ${icon}" style="color:${PALETTE[0]}"></i><span>${key}</span></div>`; });
+      div.innerHTML+=`<div class="legend-item"><i class="fa fa-map-marker-alt" style="color:#6c757d"></i><span>Other / Unknown</span></div>`;
       return div;
     };
     legend.addTo(map);
   }
 
   function updateCharts(data){
-    if (!document.getElementById("chart1")) return;
-
-    const typeCount = {};
-    const hourCount = new Array(24).fill(0);
-    const dayCount = new Array(7).fill(0);
-    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-    data.forEach(c => {
-      const type = c.type || "Unknown";
-      typeCount[type] = (typeCount[type] || 0) + 1;
-      const d = new Date(c.date);
-      if (!isNaN(d)) { hourCount[d.getHours()]++; dayCount[d.getDay()]++; }
+    if(!document.getElementById("chart1")) return;
+    const typeCount={}, hourCount=new Array(24).fill(0), dayCount=new Array(7).fill(0), days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    data.forEach(c=>{
+      const type=c.type||"Unknown"; typeCount[type]=(typeCount[type]||0)+1;
+      const d=new Date(c.date); if(!isNaN(d)){ hourCount[d.getHours()]++; dayCount[d.getDay()]++; }
     });
-
-    const topTypes = Object.entries(typeCount).sort((a,b) => b[1]-a[1]).slice(0,10);
-
-    const ctxType = document.getElementById("chart1");
-    const ctxHour = document.getElementById("chart2");
-    const ctxDay = document.getElementById("chart3");
-
-    if (charts.type) charts.type.destroy();
-    if (charts.hour) charts.hour.destroy();
-    if (charts.day) charts.day.destroy();
-
-    charts.type = new Chart(ctxType, {
-      type: "bar",
-      data: { labels: topTypes.map(t => t[0]), datasets: [{ label: "Incidents", data: topTypes.map(t => t[1]), backgroundColor: "#dc3545" }] },
-      options: { plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}}}
-    });
-    charts.hour = new Chart(ctxHour, {
-      type: "line",
-      data: { labels: [...Array(24).keys()], datasets: [{ label: "Incidents by Hour", data: hourCount, borderColor: "#007bff", tension: 0.3 }] },
-      options: { plugins:{legend:{display:false}} }
-    });
-    charts.day = new Chart(ctxDay, {
-      type: "bar",
-      data: { labels: days, datasets: [{ label: "Incidents by Day", data: dayCount, backgroundColor: "#198754" }] },
-      options: { plugins:{legend:{display:false}} }
-    });
+    const topTypes=Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const ctxType=document.getElementById("chart1"), ctxHour=document.getElementById("chart2"), ctxDay=document.getElementById("chart3");
+    if(charts.type) charts.type.destroy();
+    if(charts.hour) charts.hour.destroy();
+    if(charts.day) charts.day.destroy();
+    charts.type=new Chart(ctxType,{type:"bar",data:{labels:topTypes.map(t=>t[0]),datasets:[{label:"Incidents",data:topTypes.map(t=>t[1]),backgroundColor:"#dc3545"}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{autoSkip:false}}}}});
+    charts.hour=new Chart(ctxHour,{type:"line",data:{labels:[...Array(24).keys()],datasets:[{label:"Incidents by Hour",data:hourCount,borderColor:"#007bff",tension:0.3} ]},options:{plugins:{legend:{display:false}}}});
+    charts.day=new Chart(ctxDay,{type:"bar",data:{labels:days,datasets:[{label:"Incidents by Day",data:dayCount,backgroundColor:"#198754"}]},options:{plugins:{legend:{display:false}}}});
   }
 
   // Drawer toggle
-  const drawer = document.getElementById("drawer");
-  const toggle = document.getElementById("chartToggle");
-  const closeBtn = document.getElementById("closeDrawer");
+  const drawer=document.getElementById("drawer"), toggle=document.getElementById("chartToggle"), closeBtn=document.getElementById("closeDrawer");
+  function toggleDrawer(open){ if(open===undefined) drawer.classList.toggle("open"); else drawer.classList.toggle("open",open); const icon=toggle.querySelector("i"); if(drawer.classList.contains("open")){ icon.classList.replace("fa-chart-bar","fa-angle-right"); setTimeout(()=>updateCharts(normData),100);} else{ icon.classList.replace("fa-angle-right","fa-chart-bar"); } }
+  toggle.addEventListener("click",()=>toggleDrawer());
+  closeBtn.addEventListener("click",()=>toggleDrawer(false));
 
-  function toggleDrawer(open) {
-    if (open === undefined) drawer.classList.toggle("open");
-    else drawer.classList.toggle("open", open);
-    const icon = toggle.querySelector("i");
-    if (drawer.classList.contains("open")) { icon.classList.replace("fa-chart-bar", "fa-angle-right"); setTimeout(() => updateCharts(normData), 100); }
-    else icon.classList.replace("fa-angle-right", "fa-chart-bar");
-  }
-  toggle.addEventListener("click", () => toggleDrawer());
-  closeBtn.addEventListener("click", () => toggleDrawer(false));
-
-  const mapToggle = document.getElementById("mapToggle");
-  const styles = [
-    { name: "Street", layer: streetTiles },
-    { name: "Dark", layer: darkTiles },
-    { name: "Satellite", layer: satelliteTiles }
-  ];
-  let currentStyle = 0;
-  function setMapStyle(index) {
-    map.eachLayer(layer => map.removeLayer(layer));
-    styles[index].layer.addTo(map);
-    markersLayer.addTo(map);
-    mapToggle.textContent = "Map: " + styles[index].name;
-  }
-  mapToggle.addEventListener("click", () => { currentStyle = (currentStyle + 1) % styles.length; setMapStyle(currentStyle); });
+  // Map style toggle
+  const mapToggleBtn=document.getElementById("mapToggle");
+  const styles=[{name:"Street",layer:streetTiles},{name:"Dark",layer:darkTiles},{name:"Satellite",layer:satelliteTiles}];
+  let currentStyle=0;
+  function setMapStyle(index){ map.eachLayer(layer=>map.removeLayer(layer)); styles[index].layer.addTo(map); markersLayer.addTo(map); mapToggleBtn.textContent="Map: "+styles[index].name; }
+  mapToggleBtn.addEventListener("click",()=>{ currentStyle=(currentStyle+1)%styles.length; setMapStyle(currentStyle); });
 
   document.getElementById('filterBtn').addEventListener('click', applyFilters);
-  document.getElementById('resetBtn').addEventListener('click', ()=>{
-    document.getElementById('startDate').value=''; document.getElementById('endDate').value=''; document.getElementById('crimeType').value='';
+  document.getElementById('resetBtn').addEventListener('click',()=>{
+    document.getElementById('startDate').value='';
+    document.getElementById('endDate').value='';
+    document.getElementById('startTime').value='00:00';
+    document.getElementById('endTime').value='23:59';
+    document.getElementById('crimeType').value='';
     renderMarkers(normData);
     updateCharts(normData);
   });
