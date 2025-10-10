@@ -67,7 +67,7 @@
       z-index: 1000;
     }
 
-    /* Chart drawer styles on right */
+    /* Chart drawer toggle */
     #chartToggle{
       background-color:#FFF;
       padding: 5px;
@@ -75,15 +75,16 @@
       right: 10px;
       top: 70px;
       z-index: 1000;
+      cursor:pointer;
     }
 
+    /* Drawer styles */
     .drawer {
       position: absolute;
       top: 0;
       right: 0;
       width: 350px;
       height: 100%;
-      /*background: rgba(255, 255, 255, 0.5);*/ 
       backdrop-filter: blur(10px);
       box-shadow: -4px 0 10px rgba(0,0,0,0.2);
       transform: translateX(100%);
@@ -94,9 +95,7 @@
       flex-direction: column;
     }
 
-    .drawer.open {
-      transform: translateX(0);
-    }
+    .drawer.open { transform: translateX(0); }
 
     .drawer-header {
       padding: 10px 16px;
@@ -114,18 +113,22 @@
       overflow-y: auto;
     }
 
-    /* Optional: darker mode adjustment */
+    /* Optional: dark mode */
     @media (prefers-color-scheme: dark) {
       #controls, #disclaimer, .legend {
-        background: rgba(30, 30, 30, 0.95);
+        background: rgba(30,30,30,0.95);
         color: #f1f1f1;
       }
+      .info{ color: #929292; }
+      .drawer { background: rgba(30,30,30,0.95); color:#f1f1f1; }
+      .drawer-header { background: #222; border-bottom-color: #444; }
     }
   </style>
 </head>
 <body>
 
 <div id="controls">
+  <h1>Olmsted Incident Map</h1>
   <label>From: <input type="date" id="startDate"></label>
   <label>To: <input type="date" id="endDate"></label>
 
@@ -159,7 +162,6 @@
   </div>
 </div>
 
-
 <div id="disclaimer">
   ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
 </div>
@@ -171,7 +173,7 @@
   const ZOOM = 11;
 
   const streetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' });
-  const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>', subdomains: "abcd", maxZoom: 19});
+  const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:"abcd", maxZoom:19 });
   const satelliteTiles = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap' });
 
   const map = L.map('map', { layers: [streetTiles] }).setView(CENTER, ZOOM);
@@ -244,52 +246,22 @@
     </div>`;
   }
 
-function iconForType(type) {
-  const t = (type || '').toLowerCase();
-  let iconClass = "fa-map-marker-alt";
-  let color = "#6c757d"; // neutral gray fallback
+  // New color palette
+  const PALETTE = ["#D7D7D9","#638C45","#D9C0A3","#A66B38","#401201"];
 
-  const icons = {
-    "accident": ["fa-car-burst", "#dc3545"],
-    "accident injury": ["fa-ambulance", "#c82333"],
-    "alarm": ["fa-bell", "#ffc107"],
-    "animal": ["fa-paw", "#795548"],
-    "app order": ["fa-mobile-screen", "#6c757d"],
-    "assist": ["fa-hands-helping", "#17a2b8"],
-    "assist fd": ["fa-fire-extinguisher", "#fd7e14"],
-    "community service": ["fa-people-group", "#20c997"],
-    "damage to property": ["fa-house-crack", "#6610f2"],
-    "death investigation": ["fa-cross", "#212529"],
-    "drugs - paraphernalia": ["fa-capsules", "#28a745"],
-    "escape": ["fa-person-running", "#e83e8c"],
-    "escort": ["fa-shield-halved", "#007bff"],
-    "medical": ["fa-stethoscope", "#0dcaf0"],
-    "new call": ["fa-bolt", "#6610f2"],
-    "paper service": ["fa-file-signature", "#6f42c1"],
-    "parking violation": ["fa-square-parking", "#adb5bd"],
-    "person in crisis": ["fa-triangle-exclamation", "#ff851b"],
-    "probation check": ["fa-id-card", "#17a2b8"],
-    "project lifesaver": ["fa-satellite-dish", "#6610f2"],
-    "suspicious circumstance": ["fa-eye", "#ffc107"],
-    "traffic assist - complaint": ["fa-road", "#007bff"],
-    "traffic enforcement": ["fa-gauge-high", "#0d6efd"],
-    "traffic stop": ["fa-stop", "#dc3545"],
-    "warrant": ["fa-gavel", "#343a40"]
-  };
+  function iconForType(type) {
+    const t = (type || '').toLowerCase();
+    // assign a color based on hash of type to palette
+    const index = Math.abs([...t].reduce((sum,c)=>sum + c.charCodeAt(0),0)) % PALETTE.length;
+    const color = PALETTE[index];
 
-  // find a matching key using substring search
-  const match = Object.entries(icons).find(([k]) => t.includes(k));
-  if (match) [iconClass, color] = match[1];
-  else console.warn(`⚠️ Unknown incident type: "${type}" — using fallback icon.`);
-
-  return L.divIcon({
-    html: `<i class="fa ${iconClass} fa-icon" style="color:${color}"></i>`,
-    className: "",
-    iconSize: [24, 24],
-    iconAnchor: [12, 24]
-  });
-}
-
+    return L.divIcon({
+      html: `<i class="fa fa-map-marker-alt fa-icon" style="color:${color}"></i>`,
+      className: "",
+      iconSize: [24, 24],
+      iconAnchor: [12, 24]
+    });
+  }
 
   function renderMarkers(data){
     markersLayer.clearLayers();
@@ -325,180 +297,112 @@ function iconForType(type) {
     updateCharts(filtered);
   }
 
-  function addLegend(map) {
-  const legend = L.control({ position: "bottomleft" });
-
-  legend.onAdd = function () {
-    const div = L.DomUtil.create("div", "legend");
-    div.innerHTML = `<h4>Incident Types</h4>`;
-
-    const icons = {
-      "Accident": ["fa-car-burst", "#dc3545"],
-      "Accident Injury": ["fa-ambulance", "#c82333"],
-      "Alarm": ["fa-bell", "#ffc107"],
-      "Animal": ["fa-paw", "#795548"],
-      "App Order": ["fa-mobile-screen", "#6c757d"],
-      "Assist": ["fa-hands-helping", "#17a2b8"],
-      "Assist FD": ["fa-fire-extinguisher", "#fd7e14"],
-      "Community Service": ["fa-people-group", "#20c997"],
-      "Damage to Property": ["fa-house-crack", "#6610f2"],
-      "Death Investigation": ["fa-cross", "#212529"],
-      "Drugs - Paraphernalia": ["fa-capsules", "#28a745"],
-      "Escape": ["fa-person-running", "#e83e8c"],
-      "Escort": ["fa-shield-halved", "#007bff"],
-      "Medical": ["fa-stethoscope", "#0dcaf0"],
-      "New Call": ["fa-bolt", "#6610f2"],
-      "Paper Service": ["fa-file-signature", "#6f42c1"],
-      "Parking Violation": ["fa-square-parking", "#adb5bd"],
-      "Person in Crisis": ["fa-triangle-exclamation", "#ff851b"],
-      "Probation Check": ["fa-id-card", "#17a2b8"],
-      "Project Lifesaver": ["fa-satellite-dish", "#6610f2"],
-      "Suspicious Circumstance": ["fa-eye", "#ffc107"],
-      "Traffic Assist - Complaint": ["fa-road", "#007bff"],
-      "Traffic Enforcement": ["fa-gauge-high", "#0d6efd"],
-      "Traffic Stop": ["fa-stop", "#dc3545"],
-      "Warrant": ["fa-gavel", "#343a40"]
+  function addLegend(map){
+    const legend = L.control({ position: "bottomleft" });
+    legend.onAdd = function () {
+      const div = L.DomUtil.create("div", "legend");
+      div.innerHTML = `<h4>Incident Types</h4>`;
+      const types = Array.from(new Set(normData.map(d=>d.type).filter(Boolean))).sort();
+      types.forEach((t,i)=>{
+        const color = PALETTE[i % PALETTE.length];
+        div.innerHTML += `<div><i class="fa fa-map-marker-alt" style="color:${color}"></i> <span>${t}</span></div>`;
+      });
+      div.innerHTML += `<div><i class="fa fa-map-marker-alt" style="color:#6c757d"></i> <span>Other / Unknown</span></div>`;
+      return div;
     };
-
-    Object.entries(icons).forEach(([label, [icon, color]]) => {
-      div.innerHTML += `
-        <div class="legend-item">
-          <i class="fa ${icon}" style="color:${color}"></i>
-          <span>${label}</span>
-        </div>`;
-    });
-
-    div.innerHTML += `
-      <div class="legend-item">
-        <i class="fa fa-map-marker-alt" style="color:#6c757d"></i>
-        <span>Other / Unknown</span>
-      </div>`;
-
-    return div;
-  };
-
-  legend.addTo(map);
-}
-
+    legend.addTo(map);
+  }
 
   function updateCharts(data){
-    if (!document.getElementById("chart1")) {
-      console.warn("Charts not ready yet.");
-      return;
-    }
+    if (!document.getElementById("chart1")) return;
 
     const typeCount = {};
     const hourCount = new Array(24).fill(0);
     const dayCount = new Array(7).fill(0);
     const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
-    data.forEach(c => {
+    data.forEach(c=>{
       const type = c.type || "Unknown";
       typeCount[type] = (typeCount[type] || 0) + 1;
       const d = new Date(c.date);
-      if (!isNaN(d)) {
+      if(!isNaN(d)) {
         hourCount[d.getHours()]++;
         dayCount[d.getDay()]++;
       }
     });
 
-    const topTypes = Object.entries(typeCount)
-      .sort((a,b) => b[1]-a[1])
-      .slice(0,10);
+    const topTypes = Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
 
     const ctxType = document.getElementById("chart1");
     const ctxHour = document.getElementById("chart2");
     const ctxDay = document.getElementById("chart3");
 
-    if (charts.type) charts.type.destroy();
-    if (charts.hour) charts.hour.destroy();
-    if (charts.day) charts.day.destroy();
+    if(charts.type) charts.type.destroy();
+    if(charts.hour) charts.hour.destroy();
+    if(charts.day) charts.day.destroy();
 
-    charts.type = new Chart(ctxType, {
-      type: "bar",
-      data: {
-        labels: topTypes.map(t => t[0]),
-        datasets: [{
-          label: "Incidents",
-          data: topTypes.map(t => t[1]),
-          backgroundColor: "#dc3545"
-        }]
+    charts.type = new Chart(ctxType,{
+      type:"bar",
+      data:{
+        labels: topTypes.map(t=>t[0]),
+        datasets:[{label:"Incidents",data:topTypes.map(t=>t[1]),backgroundColor: PALETTE}]
       },
-      options: { plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}}}
+      options:{plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false}}}}
     });
 
-    charts.hour = new Chart(ctxHour, {
-      type: "line",
-      data: {
-        labels: [...Array(24).keys()],
-        datasets: [{
-          label: "Incidents by Hour",
-          data: hourCount,
-          borderColor: "#007bff",
-          tension: 0.3
-        }]
-      },
-      options: { plugins:{legend:{display:false}}}
+    charts.hour = new Chart(ctxHour,{
+      type:"line",
+      data:{labels:[...Array(24).keys()],datasets:[{label:"Incidents by Hour",data:hourCount,borderColor:"#401201",tension:0.3}]},
+      options:{plugins:{legend:{display:false}}}
     });
 
-    charts.day = new Chart(ctxDay, {
-      type: "bar",
-      data: {
-        labels: days,
-        datasets: [{
-          label: "Incidents by Day",
-          data: dayCount,
-          backgroundColor: "#198754"
-        }]
-      },
-      options: { plugins:{legend:{display:false}}}
+    charts.day = new Chart(ctxDay,{
+      type:"bar",
+      data:{labels:days,datasets:[{label:"Incidents by Day",data:dayCount,backgroundColor:"#638C45"}]},
+      options:{plugins:{legend:{display:false}}}
     });
   }
 
- // Drawer toggle
-  const drawer = document.getElementById("drawer"); // ✅ matches HTML id
+  // Drawer toggle
+  const drawer = document.getElementById("drawer");
   const toggle = document.getElementById("chartToggle");
   const closeBtn = document.getElementById("closeDrawer");
 
-  // open/close drawer
-  function toggleDrawer(open) {
-    if (open === undefined) drawer.classList.toggle("open");
+  function toggleDrawer(open){
+    if(open===undefined) drawer.classList.toggle("open");
     else drawer.classList.toggle("open", open);
     const icon = toggle.querySelector("i");
-    if (drawer.classList.contains("open")) {
-      icon.classList.replace("fa-chart-bar", "fa-angle-right");
-      // only render charts once drawer is visible
-      setTimeout(() => updateCharts(normData), 100);
+    if(drawer.classList.contains("open")){
+      icon.classList.replace("fa-chart-bar","fa-angle-right");
+      setTimeout(()=>updateCharts(normData),100);
     } else {
-      icon.classList.replace("fa-angle-right", "fa-chart-bar");
+      icon.classList.replace("fa-angle-right","fa-chart-bar");
     }
   }
 
-  toggle.addEventListener("click", () => toggleDrawer());
-  closeBtn.addEventListener("click", () => toggleDrawer(false));
+  toggle.addEventListener("click",()=>toggleDrawer());
+  closeBtn.addEventListener("click",()=>toggleDrawer(false));
 
-
-  // Map style toggle (cycles between Street → Dark → Satellite)
+  // Map style toggle
   const mapToggle = document.getElementById("mapToggle");
   const styles = [
-    { name: "Street", layer: streetTiles },
-    { name: "Dark", layer: darkTiles },
-    { name: "Satellite", layer: satelliteTiles }
+    { name:"Street", layer:streetTiles },
+    { name:"Dark", layer:darkTiles },
+    { name:"Satellite", layer:satelliteTiles }
   ];
   let currentStyle = 0;
 
-  function setMapStyle(index) {
-    map.eachLayer(layer => map.removeLayer(layer));
+  function setMapStyle(index){
+    map.eachLayer(layer=>map.removeLayer(layer));
     styles[index].layer.addTo(map);
     markersLayer.addTo(map);
-    mapToggle.textContent = "Map: " + styles[index].name;
+    mapToggle.textContent = "Map: "+styles[index].name;
   }
 
-  mapToggle.addEventListener("click", () => {
-    currentStyle = (currentStyle + 1) % styles.length;
+  mapToggle.addEventListener("click",()=>{
+    currentStyle = (currentStyle+1) % styles.length;
     setMapStyle(currentStyle);
   });
-
 
   document.getElementById('filterBtn').addEventListener('click', applyFilters);
   document.getElementById('resetBtn').addEventListener('click', ()=>{
