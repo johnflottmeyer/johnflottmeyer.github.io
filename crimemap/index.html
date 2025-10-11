@@ -75,15 +75,29 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
 }
 
 .drawer-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+  padding-bottom: 50px;
 }
 
+
+/* Improve chart text readability */
 .drawer canvas {
   width: 100% !important;
-  height: 350px !important; /* give explicit height */
+  height: 380px !important;
 }
+
+.chartjs-render-monitor {
+  font-size: 16px !important;
+}
+
+/* Ensure titles and labels are readable */
+.chart-title {
+  font-size: 18px !important;
+  font-weight: 600;
+}
+
+
 
 /* Mobile: switch to single column for narrow screens */
 @media (max-width: 600px) {
@@ -275,6 +289,12 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
     };
     legend.addTo(map);
   }
+  // Global Chart.js font and color settings
+  Chart.defaults.font.size = 14;
+  Chart.defaults.font.family = "Roboto, sans-serif";
+  Chart.defaults.color = "#222";
+  Chart.defaults.plugins.title.font = { size: 18, weight: "bold" };
+  Chart.defaults.plugins.legend.labels.font = { size: 14 };
 
   function updateCharts(data){
   if(!document.getElementById("chart1")) return;
