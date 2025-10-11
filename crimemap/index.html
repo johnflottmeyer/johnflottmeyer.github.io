@@ -75,12 +75,14 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
 }
 
 .drawer-content {
-  display: contents; /* grid handles layout of canvases */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
 }
 
 .drawer canvas {
   width: 100% !important;
-  height: 100% !important;
+  height: 350px !important; /* give explicit height */
 }
 
 /* Mobile: switch to single column for narrow screens */
@@ -389,7 +391,7 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
   // 9. Heatmap Placeholder (scatter)
   charts.heat=new Chart(ctxHeat,{
     type:"scatter",
-    data:{ datasets:[{label:"Incident Locations", data:normData.filter(d=>d.lat&&d.lng).map(d=>({x:d.lng, y:d.lat})), backgroundColor:"#dc3545"}] },
+    data:{ datasets:[{label:"Incident Locations", data: data.filter(d=>d.lat&&d.lng).map(d=>({x:d.lng, y:d.lat})), backgroundColor:"#dc3545"}] },
     options:{ plugins:{title:{display:true, text:"Incident Locations (Scatter)"}} } 
   });
 
