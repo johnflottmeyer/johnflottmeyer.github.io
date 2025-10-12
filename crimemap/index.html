@@ -35,82 +35,111 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
 #disclaimer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); padding: 8px 12px; font-size: 13px; text-align: center; border-top: 1px solid #ccc; color: #333; z-index: 1000; }
 
 /* Chart drawer */
-#chartToggle{ background-color:#FFF; padding: 5px; position: absolute; right: 10px; top: 70px; z-index: 1000; }
-.drawer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-  z-index: 2000;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* responsive columns */
-  grid-auto-rows: minmax(350px, auto);
-  gap: 20px;
-  padding: 80px 20px 20px 20px; /* top padding for header */
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  overflow-y: auto;
+#chartToggle {
+  background-color: #7C2C2C;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  position: absolute;
+  right: 10px;
+  top: 70px;
+  z-index: 1000;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+#chartToggle:hover {
+  background-color: #5e1f1f;
 }
 
+/* Chart Drawer (fixed & responsive) */
+.drawer {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  transform: translateX(100%);
+  transition: transform 0.35s ease-in-out;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Slide in when open */
 .drawer.open {
   transform: translateX(0);
 }
 
+/* Header bar */
 .drawer-header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  width: 100%;
-  padding: 10px 20px;
-  background: #f7f7f7;
-  border-bottom: 1px solid #ddd;
-  font-weight: bold;
+  background: #7C2C2C;
+  color: #fff;
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 600;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 2100;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.drawer-header button {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+.drawer-header button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Charts layout */
 .drawer-content {
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   gap: 30px;
-  padding-bottom: 50px;
+  padding: 30px;
 }
 
-
-/* Improve chart text readability */
+/* Each chart canvas container */
 .drawer canvas {
   width: 100% !important;
-  height: 380px !important;
+  height: 400px !important;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  padding: 10px;
 }
 
+/* Chart titles & text */
 .chartjs-render-monitor {
   font-size: 16px !important;
 }
-
-/* Ensure titles and labels are readable */
 .chart-title {
   font-size: 18px !important;
   font-weight: 600;
 }
 
-
-
-/* Mobile: switch to single column for narrow screens */
-@media (max-width: 600px) {
-  .drawer {
-    grid-template-columns: 1fr; /* single column */
-    grid-auto-rows: minmax(300px, auto);
-    padding-top: 70px;
+/* Mobile adjustments */
+@media (max-width: 700px) {
+  .drawer-content {
+    grid-template-columns: 1fr;
+    padding: 15px;
   }
-
   .drawer canvas {
-    min-height: 300px;
+    height: 320px !important;
   }
 }
+
 
 @media (prefers-color-scheme: dark) {
   #controls { background-color:#638C45; color:#f1f1f1; }
