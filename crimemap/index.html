@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Crime Map with Legend & Charts</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crime Dashboard</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
 
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -11,244 +14,118 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.0.0"></script>
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <style>
-body { margin:0; font-family: "Roboto", Arial, sans-serif; }
-.logo{ font-family: "Doto", Arial, sans-serif; margin: 0 30px 0 10px; }
-#controls { padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#f6f7f8; border-bottom:1px solid #ccc; z-index:1001; position:relative; }
-#controls label { font-size: 14px; }
-#controls select,input[type="date"],input[type="time"],button { padding:5px 8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
-#map { height: calc(100vh - 100px); width:100%; position:relative; }
-.info { font-size:13px; color:#555; }
-.fa-icon { font-size: 20px; background-color: rgba(255,255,255,0.5); border:1px solid #FFF; padding: 5px; border-radius: 60%; color: #7C2C2C; }
-.legend { background:white; padding:8px; border-radius:6px; box-shadow:0 0 15px rgba(0,0,0,0.2); font-size:14px; }
-.legend i { margin-right:6px; }
-.legend h4 { margin-top: 0; }
-#disclaimer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); padding: 8px 12px; font-size: 13px; text-align: center; border-top: 1px solid #ccc; color: #333; z-index: 1000; }
-
-/* Chart drawer */
-#chartToggle {
-  background-color: #7C2C2C;
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 8px;
-  position: absolute;
-  right: 10px;
-  top: 70px;
-  z-index: 1000;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-#chartToggle:hover {
-  background-color: #5e1f1f;
-}
-
-/* Full-screen drawer (dashboard shelf) */
-.drawer {
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(4px);
-  transform: translateY(100%);
-  transition: transform 0.45s ease;
-  overflow-y: auto;
-  z-index: 9999;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.drawer.open {
-  transform: translateY(0);
-}
-
-/* Grid layout for charts */
-.drawer-content {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  width: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
-  padding-bottom: 80px;
-}
-
-/* Individual chart containers */
-.chart-container {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 1.2rem 1.5rem 1.8rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.chart-container:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
-}
-
-/* Chart titles */
-.chart-title {
-  font-size: 20px !important;
-  font-weight: 600;
-  margin-bottom: 12px;
-  text-align: center;
-  color: #222;
-}
-
-/* Chart canvas */
-.drawer canvas {
-  width: 100% !important;
-  height: 380px !important;
-}
-
-/* Tablet layout */
-@media (max-width: 1100px) {
-  .drawer-content {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Mobile layout */
-@media (max-width: 768px) {
-  .drawer-content {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .drawer {
-    padding: 1rem;
-  }
-  .drawer canvas {
-    height: 320px !important;
-  }
-  .chart-title {
-    font-size: 18px !important;
-  }
-}
-
-
-/* Chart panel readability and spacing */
-#chartsPanel {
-  overflow-y: auto;
-  max-height: 90vh;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.97);
-  color: #111;
-  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-  font-size: 17px; /* larger base font */
-  line-height: 1.6;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-}
-
-/* Chart container blocks */
-.chart-container {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-}
-
-/* Headings inside chart containers */
-.chart-container h2,
-.chart-container h3 {
-  font-size: 1.4rem;  /* bigger */
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-  color: #000;
-}
-
-/* Chart.js legends and labels */
-.chartjs-render-monitor,
-canvas {
-  max-width: 100%;
-  height: auto !important;
-}
-
-/* Improve small text (like axis labels) */
-.chartjs-size-monitor,
-.chartjs-size-monitor-expand,
-.chartjs-size-monitor-shrink {
-  font-size: 16px !important;
-}
-
-/* Optional: dark mode variant */
-.dark-chart #chartsPanel {
-  background: rgba(25, 25, 25, 0.95);
-  color: #eee;
-}
-
-.dark-chart .chart-container {
-  background: rgba(40, 40, 40, 0.9);
-}
-
-.dark-chart h2,
-.dark-chart h3 {
-  color: #fff;
-}
-
-@media (prefers-color-scheme: dark) {
-  #controls { background-color:#638C45; color:#f1f1f1; }
-  .legend{ background-color:#D9C0A3; }
-  #disclaimer{ background-color:#D7D7D9; }
-  .info { color: #929292; }
-}
+    body { margin:0; font-family: "Roboto", Arial, sans-serif; }
+    .logo{ font-family: "Doto", Arial, sans-serif; font-size:30px; font-weight: bold;}
+    .controls{background-color:#638C45; margin-top: 10px !important;}
 </style>
 </head>
-<body>
-
-<div id="controls">
-  <h1 class="logo">Olmsted Incident Report</h1>
-  <label>From: <input type="date" id="startDate"></label>
-  <label>To: <input type="date" id="endDate"></label>
-  <label>From Time: <input type="time" id="startTime" value="00:00"></label>
-  <label>To Time: <input type="time" id="endTime" value="23:59"></label>
-  <label>Type: <select id="crimeType"><option value="">All</option></select></label>
-  <button id="filterBtn">Apply</button>
-  <button id="resetBtn">Reset</button>
-  <button id="mapToggle">Map: Street</button>
-  <span class="info" id="status">Loading…</span>
-</div>
-
-<div id="map"></div>
-
-<div id="chartToggle" title="Toggle Charts">
-  <i class="fa fa-chart-bar"></i>
-</div>
-
-<div id="drawer" class="drawer">
-  <div class="drawer-header">
-    <span>Crime Charts</span>
-    <button id="closeDrawer">✕</button>
+<body class="bg-gray-50">
+<div class="max-w-7xl mx-auto p-4 space-y-6">
+  <!-- FILTER CONTROLS -->
+   <h1 class="logo">Olmsted Incident Report</h1>
+  <div class="flex flex-wrap text-white items-center gap-4 p-4 rounded shadow controls">
+    <label>From: <input type="date" id="startDate" class="border rounded px-2 py-1"></label>
+    <label>To: <input type="date" id="endDate" class="border rounded px-2 py-1"></label>
+    <label>Crime Type:
+      <select id="crimeType" class="border rounded px-2 py-1">
+        <option value="">All</option>
+      </select>
+    </label>
+    <button id="filterBtn" class="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800">Apply</button>
+    <button id="resetBtn" class="bg-black px-3 py-1 rounded hover:bg-gray-400">Reset</button>
+    <span id="status" class="ml-4 text-gray-300"></span>
   </div>
-  <div class="drawer-content">
-    <canvas id="chart1"></canvas>
-    <canvas id="chart2"></canvas>
-    <canvas id="chart3"></canvas>
-    <canvas id="chart4"></canvas>
-    <canvas id="chart5"></canvas>
-    <canvas id="chart6"></canvas>
-    <canvas id="chart7"></canvas>
-    <canvas id="chart8"></canvas>
-    <canvas id="chart9"></canvas>
-    <canvas id="chart10"></canvas>
-    <canvas id="chart11"></canvas>
-    <canvas id="chart12"></canvas>
-  </div>
-</div>
 
-<div id="disclaimer">
-  ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
+  <!-- SUMMARY CARDS -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white p-4 rounded shadow text-center">
+      <div class="text-gray-500">Total Crimes</div>
+      <div id="totalCrimes" class="text-2xl font-bold">0</div>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <div class="text-gray-500">Most Frequent</div>
+      <div id="mostFrequent" class="text-2xl font-bold">N/A</div>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <div class="text-gray-500">Peak Crime Hour</div>
+      <div id="peakHour" class="text-2xl font-bold">0</div>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <div class="text-gray-500">Most Incidents per City</div>
+      <div id="topNeighborhood" class="text-2xl font-bold">N/A</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT ROW -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Left Column Charts -->
+    <div class="space-y-6">
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-semibold text-lg mb-2">Crimes by Hour</h3>
+        <canvas id="chartHour"></canvas>
+      </div>
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-semibold text-lg mb-2">Crimes by Day</h3>
+        <canvas id="chartDay"></canvas>
+      </div>
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-semibold text-lg mb-2">Hours × Day Heatmap</h3>
+        <canvas id="chartHeatmap"></canvas>
+      </div>
+    </div>
+
+    <!-- Center Column Map -->
+    <div class="bg-white rounded shadow overflow-hidden">
+       <div id="legendOverlay" class="absolute top-4 right-4 bg-white bg-opacity-90 p-4 rounded shadow max-h-80 overflow-y-auto w-64 hidden z-50">
+        <button id="toggleLegendOverlay" class="text-gray-700 hover:text-gray-900 mb-2 font-semibold">Legend ▲</button>
+        <ul id="legendListOverlay" class="space-y-1 text-sm">
+            <!-- populated dynamically -->
+        </ul>
+        </div>
+
+      <div id="crimeMap" class="w-full h-[600px]"></div>
+    </div>
+
+    <!-- Right Column Charts -->
+    <div class="space-y-6">
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-semibold text-lg mb-2">Crime Type Distribution</h3>
+        <canvas id="chartType"></canvas>
+      </div>
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-semibold text-lg mb-2">Top Streets</h3>
+        <canvas id="chartStreets"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOWER ROW -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-4 rounded shadow">
+      <h3 class="font-semibold text-lg mb-2">Monthly Trend</h3>
+      <canvas id="chartMonth"></canvas>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      <h3 class="font-semibold text-lg mb-2">Crimes by District</h3>
+      <canvas id="chartDistrict"></canvas>
+    </div>
+  </div>
+
+  <div id="disclaimer" class="grid grid-cols-1 gap-6">
+    <div>
+  ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.</div>
+</div>
 </div>
 
 <script>
@@ -256,13 +133,6 @@ canvas {
   const DATA_URL = "https://script.google.com/macros/s/AKfycbyu7pbLizSL2QH-ZIp_sFGAlRwvvZupQN_x6OLh2a_ra5nseqP-0ww-D3KbJCzYCi_7_Q/exec";
   const CENTER = [44.0221, -92.4630];
   const ZOOM = 11;
-  const streetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' });
-  const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:"abcd", maxZoom:19});
-  const satelliteTiles = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap' });
-
-  const map = L.map('map', { layers: [streetTiles] }).setView(CENTER, ZOOM);
-  let markersLayer = L.layerGroup().addTo(map);
-  let rawData=[], normData=[], charts={};
   const PALETTE = ["#7C2C2C"];
   const ICONS = {
     "accident": "fa-car-burst",
@@ -292,313 +162,231 @@ canvas {
     "warrant": "fa-gavel"
   };
 
-  function pick(o, keys){ for(const k of keys) if(o && o[k]!==undefined && o[k]!==null && String(o[k]).trim()!=="") return o[k]; return ""; }
-  function normalize(rec){
-    const raw = rec||{};
-    const dateStr = pick(raw, ['createDateTime','CreateDateTime','DateTimeIncident','date','datetime']);
-    let date = dateStr?new Date(dateStr):null;
-    const lat=parseFloat(pick(raw,['lat','Lat','latitude','Latitude']));
-    const lng=parseFloat(pick(raw,['long','lng','lon','Longitude']));
-    return { raw, date, dateRaw: dateStr||"", lat:(!isNaN(lat)?lat:null), lng:(!isNaN(lng)?lng:null), type: pick(raw,['incidentType','IncidentType','crime','Crime','type','Type','Incident']), address: pick(raw,['FullAddress','address','Address','location','Location']), city: pick(raw,['city','City','venue','Venue']), zip: pick(raw,['zip','Zip','postal','Postal']) };
+  const map = L.map('crimeMap').setView(CENTER, ZOOM);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' }).addTo(map);
+  let markersLayer = L.layerGroup().addTo(map);
+  let normData=[], charts={};
+
+  function iconForType(type){
+    const t=(type||'').toLowerCase();
+    const iconClass = ICONS[t] || "fa-map-marker-alt";
+    return L.divIcon({ html:`<i class="fa ${iconClass}" style="color:${PALETTE[0]}"></i>`, className:"", iconSize:[24,24], iconAnchor:[12,24] });
   }
 
-  async function loadData(){
-    document.getElementById('status').textContent='Loading data…';
-    try {
-      const res = await fetch(DATA_URL);
-      if(!res.ok) throw new Error('Fetch failed: '+res.status);
-      let data = await res.json();
-      rawData = Array.isArray(data)?data:(data.records||[]);
-      if(!Array.isArray(rawData)) throw new Error('Unexpected data format');
-
-      normData = rawData.map(normalize);
-      populateTypes();
-      renderMarkers(normData);
-      addLegend(map);
-      updateCharts(normData);
-      document.getElementById('status').textContent=`Loaded ${normData.length} records`;
-    } catch(err){ console.error('Error loading data:',err); document.getElementById('status').textContent='Error loading feed'; }
-  }
-
-  function populateTypes(){
-    const types = Array.from(new Set(normData.map(d=>d.type).filter(Boolean))).sort();
-    const select = document.getElementById('crimeType');
-    select.querySelectorAll('option:not([value=""])').forEach(n=>n.remove());
-    types.forEach(t=>{ const opt=document.createElement('option'); opt.value=t; opt.textContent=t; select.appendChild(opt); });
-  }
-
-  function popupHtml(d){ return `<div style="font-size:13px;"><strong>${d.type||'Incident'}</strong><br/>${d.address||''}<br/>${d.city||''} ${d.zip||''}<br/><small>${d.dateRaw||''}</small></div>`; }
-  function iconForType(type){ const t=(type||'').toLowerCase(); let iconClass="fa-map-marker-alt"; if(ICONS[t]) iconClass=ICONS[t]; return L.divIcon({ html:`<i class="fa ${iconClass} fa-icon" style="color:${PALETTE[0]}"></i>`, className:"", iconSize:[24,24], iconAnchor:[12,24] }); }
+  function popupHtml(d){ return `<strong>${d.type||'Incident'}</strong><br>${d.address||''}<br>${d.city||''} ${d.street||''}<br>${d.dateRaw||''}`; }
 
   function renderMarkers(data){
     markersLayer.clearLayers();
-    data.sort((a,b)=>a.date-b.date);
-    let count=0, bounds=L.latLngBounds();
-    data.forEach(d=>{ if(d.lat==null||d.lng==null) return; const marker=L.marker([d.lat,d.lng],{icon:iconForType(d.type)}).bindPopup(popupHtml(d)); markersLayer.addLayer(marker); bounds.extend([d.lat,d.lng]); count++; });
+    const bounds=L.latLngBounds();
+    let count=0;
+    data.forEach(d=>{
+      if(isNaN(d.lat) || isNaN(d.lng)) return;
+      const marker = L.marker([d.lat,d.lng], {icon: iconForType(d.type)}).bindPopup(popupHtml(d));
+      markersLayer.addLayer(marker);
+      bounds.extend([d.lat,d.lng]);
+      count++;
+    });
     if(count>0) map.fitBounds(bounds);
     document.getElementById('status').textContent=`Showing ${count} of ${normData.length} records`;
   }
 
-  function applyFilters(){
-    const startVal=document.getElementById('startDate').value;
-    const endVal=document.getElementById('endDate').value;
-    const startTimeVal=document.getElementById('startTime').value||"00:00";
-    const endTimeVal=document.getElementById('endTime').value||"23:59";
-    const typeVal=document.getElementById('crimeType').value;
-    const start=startVal?new Date(startVal+'T00:00:00'):null;
-    const end=endVal?new Date(endVal+'T23:59:59'):null;
-    const [startH,startM]=startTimeVal.split(':').map(Number);
-    const [endH,endM]=endTimeVal.split(':').map(Number);
-
-    const filtered=normData.filter(d=>{
-      if(d.lat==null||d.lng==null) return false;
-      if(start && (!d.date||d.date<start)) return false;
-      if(end && (!d.date||d.date>end)) return false;
-      if(d.date){ const h=d.date.getHours(), m=d.date.getMinutes(); const afterStart=h>startH||(h===startH && m>=startM); const beforeEnd=h<endH||(h===endH && m<=endM); if(!(afterStart && beforeEnd)) return false; }
-      if(typeVal && (!d.type || d.type.toLowerCase()!==typeVal.toLowerCase())) return false;
-      return true;
-    });
-
-    renderMarkers(filtered);
-    updateCharts(filtered);
+  function updateSummary(data){
+    document.getElementById('totalCrimes').textContent = data.length;
+    const freq = {};
+    data.forEach(d=>freq[d.type]=(freq[d.type]||0)+1);
+    document.getElementById('mostFrequent').textContent = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0]?.[0]||'N/A';
+    const hours = data.map(d=>d.dateObj?.getHours()).filter(h=>h!==undefined);
+    const peakHour = hours.length ? hours.reduce((a,b)=>hours.filter(x=>x===b).length>hours.filter(x=>x===a).length?b:a, hours[0]) : 0;
+    document.getElementById('peakHour').textContent = peakHour;
+    const neighborhoods = {};
+    data.forEach(d=>neighborhoods[d.city]=(neighborhoods[d.city]||0)+1);
+    document.getElementById('topNeighborhood').textContent = Object.entries(neighborhoods).sort((a,b)=>b[1]-a[1])[0]?.[0]||'N/A';
   }
-
-  function addLegend(map){
-    const legend=L.control({ position:"bottomleft" });
-    legend.onAdd=function(){
-      const div=L.DomUtil.create("div","legend");
-      div.innerHTML="<h4>Incident Types</h4>";
-      Object.entries(ICONS).forEach(([key,icon],i)=>{ div.innerHTML+=`<div class="legend-item"><i class="fa ${icon}" style="color:${PALETTE[0]}"></i><span>${key}</span></div>`; });
-      div.innerHTML+=`<div class="legend-item"><i class="fa fa-map-marker-alt" style="color:#6c757d"></i><span>Other / Unknown</span></div>`;
-      return div;
-    };
-    legend.addTo(map);
-  }
-
-
-  // Global Chart.js settings for readability and consistency
-Chart.defaults.font.family = "Roboto, sans-serif";
-Chart.defaults.color = "#111";
-Chart.defaults.font.size = 18;
-Chart.defaults.plugins.title.font = { size: 22, weight: "bold" };
-Chart.defaults.plugins.legend.labels.font = { size: 18 };
-Chart.defaults.plugins.tooltip.bodyFont = { size: 16 };
-Chart.defaults.plugins.tooltip.titleFont = { size: 16 };
-Chart.defaults.scales = {
-  x: {
-    ticks: { color: "#222", font: { size: 16, weight: "500" } },
-    title: { color: "#000", font: { size: 18, weight: "600" } }
-  },
-  y: {
-    ticks: { color: "#222", font: { size: 16, weight: "500" } },
-    title: { color: "#000", font: { size: 18, weight: "600" } }
-  }
-};
-
-// Slightly smaller on mobile
-if (window.innerWidth < 768) {
-  Chart.defaults.font.size = 14;
-  Chart.defaults.plugins.title.font.size = 18;
-  Chart.defaults.plugins.legend.labels.font.size = 14;
-}
-
-
-
 
   function updateCharts(data){
-  if(!document.getElementById("chart1")) return;
+    if(window.charts) Object.values(window.charts).forEach(c=>c?.destroy());
+    window.charts={};
 
-  const typeCount={}, hourCount=new Array(24).fill(0), dayCount=new Array(7).fill(0);
-  const locationCount={}, severityCount={}, neighborhoodCount={}, monthCount={};
-  const clusterCount={}, topOffenders={};
-  const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    // Hourly
+    const hours = Array(24).fill(0);
+    data.forEach(d=>{ if(d.dateObj) hours[d.dateObj.getHours()]++; });
+    const ctxH = document.getElementById('chartHour').getContext('2d');
+    window.charts.chartHour = new Chart(ctxH, { type:'bar', data:{labels:Array.from(Array(24).keys()), datasets:[{label:'Crimes',data:hours,backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
 
-  data.forEach(c=>{
-    const type=c.type||"Unknown";
-    typeCount[type]=(typeCount[type]||0)+1;
+    // Day
+    const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const dayCounts = Array(7).fill(0);
+    data.forEach(d=>{ if(d.dateObj) dayCounts[d.dateObj.getDay()]++; });
+    const ctxD = document.getElementById('chartDay').getContext('2d');
+    window.charts.chartDay = new Chart(ctxD,{ type:'bar', data:{labels:days,datasets:[{label:'Crimes',data:dayCounts,backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
 
-    const d=new Date(c.date);
-    if(!isNaN(d)){
-      hourCount[d.getHours()]++;
-      dayCount[d.getDay()]++;
-      const monthKey=`${d.getFullYear()}-${d.getMonth()+1}`;
-      monthCount[monthKey]=(monthCount[monthKey]||0)+1;
-    }
+    // Heatmap
+    const heatData = [];
+    data.forEach(d=>{ if(d.dateObj){ heatData.push({x:d.dateObj.getDay(),y:d.dateObj.getHours(),v:1}); } });
+    const ctxM = document.getElementById('chartHeatmap').getContext('2d');
+    window.charts.chartHeatmap = new Chart(ctxM,{ type:'matrix', data:{datasets:[{label:'Heat',data:heatData,backgroundColor:(ctx)=>{
+      const val = ctx.dataset.data[ctx.dataIndex].v;
+      return `rgba(124,44,44,${val})`;
+    }}]}, options:{scales:{x:{type:'category',labels:days},y:{type:'category',labels:Array.from(Array(24).keys()).reverse()}}} });
 
-    const loc=c.address||"Unknown";
-    locationCount[loc]=(locationCount[loc]||0)+1;
-    topOffenders[loc]=(topOffenders[loc]||0)+1;
+    // Type
+    const typeCounts = {};
+    data.forEach(d=>typeCounts[d.type]=(typeCounts[d.type]||0)+1);
+    const ctxT = document.getElementById('chartType').getContext('2d');
+    window.charts.chartType = new Chart(ctxT,{ type:'bar', data:{labels:Object.keys(typeCounts),datasets:[{label:'Count',data:Object.values(typeCounts),backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
 
-    const neighborhood=c.city||"Unknown";
-    neighborhoodCount[neighborhood]=(neighborhoodCount[neighborhood]||0)+1;
+    // Streets
+    const streetCounts = {};
+    data.forEach(d=>streetCounts[d.street]=(streetCounts[d.street]||0)+1);
+    const topStreets = Object.entries(streetCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const ctxS = document.getElementById('chartStreets').getContext('2d');
+    window.charts.chartStreets = new Chart(ctxS,{ type:'bar', data:{labels:topStreets.map(d=>d[0]),datasets:[{label:'Count',data:topStreets.map(d=>d[1]),backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
 
-    const cluster = type[0] || "Other";
-    clusterCount[cluster]=(clusterCount[cluster]||0)+1;
+    // Monthly
+    const monthCounts = Array(12).fill(0);
+    data.forEach(d=>{ if(d.dateObj) monthCounts[d.dateObj.getMonth()]++; });
+    const ctxMo = document.getElementById('chartMonth').getContext('2d');
+    window.charts.chartMonth = new Chart(ctxMo,{ type:'line', data:{labels:Array.from(Array(12).keys()).map(m=>m+1),datasets:[{label:'Crimes',data:monthCounts,borderColor:PALETTE[0],fill:false}]}, options:{responsive:true} });
 
-    const sev = ["Minor","Major"][Math.floor(Math.random()*2)];
-    severityCount[sev]=(severityCount[sev]||0)+1;
+    // District
+    const districtCounts = {};
+    data.forEach(d=>districtCounts[d.district]=(districtCounts[d.district]||0)+1);
+    const ctxDist = document.getElementById('chartDistrict').getContext('2d');
+    window.charts.chartDistrict = new Chart(ctxDist,{ type:'bar', data:{labels:Object.keys(districtCounts),datasets:[{label:'Count',data:Object.values(districtCounts),backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
+  }
+
+  // 1️⃣ Set default dates to yesterday
+const startDateInput = document.getElementById('startDate');
+const endDateInput = document.getElementById('endDate');
+
+const today = new Date();
+const yesterday = new Date(today);
+yesterday.setDate(today.getDate() - 1);
+
+const yyyy = yesterday.getFullYear();
+const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+const dd = String(yesterday.getDate()).padStart(2, '0');
+const yestStr = `${yyyy}-${mm}-${dd}`;
+
+startDateInput.value = yestStr;
+endDateInput.value = yestStr;
+
+// 2️⃣ Filtering function
+function applyDateFilter() {
+  const startVal = startDateInput.value;
+  const endVal = endDateInput.value;
+  const typeVal = document.getElementById('crimeType').value;
+
+  const start = startVal ? new Date(startVal + 'T00:00:00') : null;
+  const end = endVal ? new Date(endVal + 'T23:59:59') : null;
+
+  const filtered = normData.filter(d => {
+    if (!d.dateObj) return false;
+    if (start && d.dateObj < start) return false;
+    if (end && d.dateObj > end) return false;
+    if (typeVal && d.type?.toLowerCase() !== typeVal.toLowerCase()) return false;
+    return true;
   });
 
-  const topTypes=Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const topLocations=Object.entries(locationCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const topNeighborhoods=Object.entries(neighborhoodCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const topOffenderLocations=Object.entries(topOffenders).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const monthLabels=Object.keys(monthCount).sort();
-  const monthValues=monthLabels.map(k=>monthCount[k]);
+  renderMarkers(filtered);
+  updateSummary(filtered);
+  updateCharts(filtered);
+}
 
-  const ctxType=document.getElementById("chart1"),
-        ctxHour=document.getElementById("chart2"),
-        ctxDay=document.getElementById("chart3"),
-        ctxLocations=document.getElementById("chart4"),
-        ctxSeverity=document.getElementById("chart5"),
-        ctxTypeProp=document.getElementById("chart6"),
-        ctxNeighborhood=document.getElementById("chart7"),
-        ctxMonth=document.getElementById("chart8"),
-        ctxHeat=document.getElementById("chart9"),
-        ctxCluster=document.getElementById("chart10"),
-        ctxOffender=document.getElementById("chart11"),
-        ctxExtra=document.getElementById("chart12");
+// 3️⃣ Auto-apply filter whenever inputs change
+startDateInput.addEventListener('change', applyDateFilter);
+endDateInput.addEventListener('change', applyDateFilter);
+document.getElementById('crimeType').addEventListener('change', applyDateFilter);
 
-  Object.values(charts).forEach(c=>c?.destroy());
+// 4️⃣ Call once after data loads to show yesterday's data immediately
+loadData().then(() => {
+  applyDateFilter();
+});
 
-  // 1. Top Types
-  charts.type=new Chart(ctxType,{
-    type:"bar",
-    data:{ labels: topTypes.map(t=>t[0]), datasets:[{label:"Incidents", data: topTypes.map(t=>t[1]), backgroundColor:"#dc3545"}] },
-    options:{ plugins:{legend:{display:false}, title:{display:true, text:"Top Incident Types"}}, scales:{x:{ticks:{autoSkip:false}}} }
-  });
 
-  // 2. Hourly
-  charts.hour=new Chart(ctxHour,{
-    type:"line",
-    data:{ labels:[...Array(24).keys()], datasets:[{label:"Incidents by Hour", data:hourCount, borderColor:"#007bff", tension:0.3}] },
-    options:{ plugins:{legend:{display:false}, title:{display:true, text:"Incidents by Hour"}} }
-  });
 
-  // 3. Day of Week
-  charts.day=new Chart(ctxDay,{
-    type:"bar",
-    data:{ labels:days, datasets:[{label:"Incidents by Day", data:dayCount, backgroundColor:"#198754"}] },
-    options:{ plugins:{legend:{display:false}, title:{display:true, text:"Incidents by Day"}} }
-  });
+  document.getElementById('filterBtn').addEventListener('click', applyDateFilter);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    document.getElementById('crimeType').value = '';
+    renderMarkers(normData);
+    updateSummary(normData);
+    updateCharts(normData);
+    });
 
-  // 4. Most Common Locations
-  charts.locations=new Chart(ctxLocations,{
-    type:"bar",
-    data:{ labels:topLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topLocations.map(t=>t[1]), backgroundColor:"#fd7e14"}] },
-    options:{ indexAxis:"y", plugins:{legend:{display:false}, title:{display:true, text:"Most Common Locations"}} }
-  });
 
-  // 5. Crime Severity Breakdown
-  charts.severity=new Chart(ctxSeverity,{
-    type:"doughnut",
-    data:{ labels:Object.keys(severityCount), datasets:[{data:Object.values(severityCount), backgroundColor:["#ffc107","#dc3545"]}] },
-    options:{ plugins:{legend:{position:"bottom"}, title:{display:true, text:"Crime Severity"}} }
-  });
+  async function loadData(){
+  document.getElementById('status').textContent='Loading data…';
+  try{
+    const res = await fetch(DATA_URL);
+    const raw = await res.json();
 
-  // 6. Crime Type Proportion
-  charts.typeProp=new Chart(ctxTypeProp,{
-    type:"pie",
-    data:{ labels:Object.keys(typeCount), datasets:[{data:Object.values(typeCount), backgroundColor:Array(Object.keys(typeCount).length).fill("#800020")}] },
-    options:{ plugins:{legend:{position:"bottom"}, title:{display:true, text:"Crime Type Proportion"}} }
-  });
+    normData = raw.map(d=>({
+      ...d,
+      type: d.incidentType || 'Unknown',
+      dateObj: new Date(d.datetime),
+      lat: parseFloat(d.lat),
+      lng: parseFloat(d.long),
+      address: d.address || '',
+      city: d.city || '',
+      street: d.address || '',
+      district: d.venue || '',
+      dateRaw: d.datetime
+    }));
 
-  // 7. Neighborhood Counts
-  charts.neighborhood=new Chart(ctxNeighborhood,{
-    type:"bar",
-    data:{ labels:topNeighborhoods.map(t=>t[0]), datasets:[{label:"Incidents", data:topNeighborhoods.map(t=>t[1]), backgroundColor:"#0dcaf0"}] },
-    options:{ indexAxis:"y", plugins:{legend:{display:false}, title:{display:true, text:"Neighborhood Incident Counts"}} }
-  });
+    // Populate crime type dropdown
+    const crimeTypeSelect = document.getElementById('crimeType');
+    crimeTypeSelect.innerHTML = '<option value="">All</option>';
+    const types = [...new Set(normData.map(d=>d.type))].sort();
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      crimeTypeSelect.appendChild(opt);
+    });
 
-  // 8. Monthly Trends
-  charts.month=new Chart(ctxMonth,{
-    type:"line",
-    data:{ labels:monthLabels, datasets:[{label:"Incidents per Month", data:monthValues, borderColor:"#6f42c1", tension:0.2}] },
-    options:{ plugins:{legend:{display:false}, title:{display:true, text:"Incidents per Month"}} }
-  });
+    // Do NOT render full data here!
+    // We'll render filtered data next
+  } catch(err){
+    console.error(err);
+    document.getElementById('status').textContent='Error loading data';
+  }
+}
 
-  // 9. Heatmap Placeholder (scatter)
-  charts.heat=new Chart(ctxHeat,{
-    type:"scatter",
-    data:{ datasets:[{label:"Incident Locations", data: data.filter(d=>d.lat&&d.lng).map(d=>({x:d.lng, y:d.lat})), backgroundColor:"#dc3545"}] },
-    options:{ plugins:{title:{display:true, text:"Incident Locations (Scatter)"}} } 
-  });
+// Load data and immediately filter to yesterday
+loadData().then(() => {
+  applyDateFilter();
+});
 
-  // 10. Cluster Count
-  charts.cluster=new Chart(ctxCluster,{
-    type:"bar",
-    data:{ labels:Object.keys(clusterCount), datasets:[{label:"Clusters", data:Object.values(clusterCount), backgroundColor:"#0d6efd"}] },
-    options:{ plugins:{legend:{display:false}, title:{display:true, text:"Incident Clusters"}} }
-  });
 
-  // 11. Top Offender Locations
-  charts.offender=new Chart(ctxOffender,{
-    type:"bar",
-    data:{ labels:topOffenderLocations.map(t=>t[0]), datasets:[{label:"Incidents", data:topOffenderLocations.map(t=>t[1]), backgroundColor:"#198754"}] },
-    options:{ indexAxis:"y", plugins:{legend:{display:false}, title:{display:true, text:"Top Offender Locations"}} }
-  });
+function buildOverlayLegend(){
+  const legendList = document.getElementById('legendListOverlay');
+  legendList.innerHTML = '';
 
-  // 12. Extra placeholder
-  charts.extra=new Chart(ctxExtra,{
-    type:"bar",
-    data:{ labels:["Extra1","Extra2"], datasets:[{label:"Extra Data", data:[5,10], backgroundColor:["#fd7e14","#6f42c1"]}] },
-    options:{ plugins:{legend:{display:false}, title:{display:true, text:"Extra Data"}} }
+  const types = [...new Set(normData.map(d=>d.type))].sort();
+  types.forEach(type=>{
+    const iconClass = ICONS[type.toLowerCase()] || "fa-map-marker-alt";
+    const li = document.createElement('li');
+    li.className = "flex items-center space-x-2";
+
+    li.innerHTML = `<i class="fa ${iconClass}" style="color:${PALETTE[0]}"></i><span>${type}</span>`;
+    legendList.appendChild(li);
   });
 }
 
-  // Drawer toggle
-  const drawer = document.getElementById("drawer");
-  const toggle = document.getElementById("chartToggle");
-  const closeBtn = document.getElementById("closeDrawer");
+// Toggle show/hide overlay legend
+document.getElementById('toggleLegendOverlay').addEventListener('click', ()=>{
+  const panel = document.getElementById('legendOverlay');
+  panel.classList.toggle('hidden');
+});
 
-  function toggleDrawer(open) {
-    const isOpen = drawer.classList.contains("open");
-    const shouldOpen = open === undefined ? !isOpen : open;
-
-    drawer.classList.toggle("open", shouldOpen);
-
-    // Change toggle icon
-    const icon = toggle.querySelector("i");
-    if (shouldOpen) {
-      icon.classList.replace("fa-chart-bar", "fa-angle-right");
-      // Update charts after a short delay to ensure layout is correct
-      setTimeout(() => updateCharts(normData), 150);
-    } else {
-      icon.classList.replace("fa-angle-right", "fa-chart-bar");
-    }
-  }
-
-  toggle.addEventListener("click", () => toggleDrawer());
-  closeBtn.addEventListener("click", () => toggleDrawer(false));
-
-  // Optional: Close drawer on Escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && drawer.classList.contains("open")) {
-      toggleDrawer(false);
-    }
-  });
+// Call after data loads
+buildOverlayLegend();
 
 
-  // Map style toggle
-  const mapToggleBtn=document.getElementById("mapToggle");
-  const styles=[{name:"Street",layer:streetTiles},{name:"Dark",layer:darkTiles},{name:"Satellite",layer:satelliteTiles}];
-  let currentStyle=0;
-  function setMapStyle(index){ map.eachLayer(layer=>map.removeLayer(layer)); styles[index].layer.addTo(map); markersLayer.addTo(map); mapToggleBtn.textContent="Map: "+styles[index].name; }
-  mapToggleBtn.addEventListener("click",()=>{ currentStyle=(currentStyle+1)%styles.length; setMapStyle(currentStyle); });
-
-  document.getElementById('filterBtn').addEventListener('click', applyFilters);
-  document.getElementById('resetBtn').addEventListener('click',()=>{
-    document.getElementById('startDate').value='';
-    document.getElementById('endDate').value='';
-    document.getElementById('startTime').value='00:00';
-    document.getElementById('endTime').value='23:59';
-    document.getElementById('crimeType').value='';
-    renderMarkers(normData);
-    updateCharts(normData);
-  });
-
-  await loadData();
 })();
 </script>
+
 </body>
 </html>
