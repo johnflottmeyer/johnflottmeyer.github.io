@@ -58,12 +58,12 @@
   <h1 class="logo">Olmsted Incident Report</h1>
 
   <!-- FILTER CONTROLS -->
-  <div class="flex flex-wrap items-center gap-4 p-4 rounded shadow mb-4 controls">
-    <label>From: <input type="date" id="startDate" class="border rounded px-2 py-1"></label>
-    <label>To: <input type="date" id="endDate" class="border rounded px-2 py-1"></label>
+  <div class="flex flex-wrap items-center gap-4 p-4 rounded shadow mb-4 controls text-white">
+    <label>From: <input type="date" id="startDate" class="border rounded px-2 py-1 text-black"></label>
+    <label>To: <input type="date" id="endDate" class="border rounded px-2 py-1 text-black"></label>
 
-    <label>Crime Type:
-      <select id="crimeType" class="border rounded px-2 py-1">
+    <label class="text-white">Crime Type:
+      <select id="crimeType" class="border text-black rounded px-2 py-1">
         <option value="">All</option>
       </select>
     </label>
@@ -71,8 +71,8 @@
     <!-- Hour Slider -->
  
 
-    <button id="resetBtn" class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400">Reset</button>
-    <span id="status" class="ml-4 text-gray-600"></span>
+    <button id="resetBtn" class="bg-black px-3 py-1 text-white ounded hover:bg-gray-400">Reset</button>
+    <span id="status" class="ml-4 text-gray-300"></span>
   </div>
 
   <!-- SUMMARY CARDS -->
