@@ -23,27 +23,56 @@
 
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<!-- noUiSlider -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+
 <style>
-    body { margin:0; font-family: "Roboto", Arial, sans-serif; }
-    .logo{ font-family: "Doto", Arial, sans-serif; font-size:30px; font-weight: bold;}
-    .controls{background-color:#638C45; margin-top: 10px !important;}
+  body { margin:0; font-family: "Roboto", Arial, sans-serif; }
+  .logo{ font-family: "Doto", Arial, sans-serif; font-size:30px; font-weight: bold;}
+  .controls{background-color:#638C45; margin-top: 10px !important;}
+  #legendOverlay { max-height: 300px; overflow-y: auto; }
+
+  /* Slider track between handles */
+  #hourSlider .noUi-connect {
+    background: #638C45; /* deep red */
+  }
+
+  /* Slider handles */
+  #hourSlider .noUi-handle {
+    background: #000; /* match handle to connect bar */
+    border: 2px solid #fff; /* optional white border for contrast */
+  }
+
+  /* Slider rail (background track) */
+  #hourSlider .noUi-target {
+    background: #eee; /* light gray track */
+  }
 </style>
 </head>
 <body class="bg-gray-50">
 <div class="max-w-7xl mx-auto p-4 space-y-6">
+
+  <!-- HEADER -->
+  <h1 class="logo">Olmsted Incident Report</h1>
+
   <!-- FILTER CONTROLS -->
-   <h1 class="logo">Olmsted Incident Report</h1>
-  <div class="flex flex-wrap text-white items-center gap-4 p-4 rounded shadow controls">
-    <label>From: <input type="date" id="startDate" class="border rounded px-2 py-1 text-black"></label>
-    <label>To: <input type="date" id="endDate" class="border rounded px-2 py-1 text-black"></label>
+  <div class="flex flex-wrap items-center gap-4 p-4 rounded shadow mb-4 controls">
+    <label>From: <input type="date" id="startDate" class="border rounded px-2 py-1"></label>
+    <label>To: <input type="date" id="endDate" class="border rounded px-2 py-1"></label>
+
     <label>Crime Type:
-      <select id="crimeType" class="border rounded px-2 py-1 text-black">
+      <select id="crimeType" class="border rounded px-2 py-1">
         <option value="">All</option>
       </select>
     </label>
-    <button id="filterBtn" class="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800">Apply</button>
-    <button id="resetBtn" class="bg-black px-3 py-1 rounded hover:bg-gray-400">Reset</button>
-    <span id="status" class="ml-4 text-gray-300"></span>
+
+    <!-- Hour Slider -->
+ 
+
+    <button id="resetBtn" class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400">Reset</button>
+    <span id="status" class="ml-4 text-gray-600"></span>
   </div>
 
   <!-- SUMMARY CARDS -->
@@ -66,10 +95,9 @@
     </div>
   </div>
 
-  <!-- MAIN CONTENT ROW -->
+  <!-- MAIN ROW -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    <!-- Left Column Charts -->
+    <!-- Left Charts -->
     <div class="space-y-6">
       <div class="bg-white p-4 rounded shadow">
         <h3 class="font-semibold text-lg mb-2">Crimes by Hour</h3>
@@ -85,19 +113,23 @@
       </div>
     </div>
 
-    <!-- Center Column Map -->
-    <div class="bg-white rounded shadow overflow-hidden">
-       <div id="legendOverlay" class="absolute top-4 right-4 bg-white bg-opacity-90 p-4 rounded shadow max-h-80 overflow-y-auto w-64 hidden z-50">
+    <!-- Map Column -->
+    
+    <div class="relative bg-white rounded shadow">
+       <div class="flex flex-col flex-1 min-w-[200px] mb-4">
+      <label class="font-semibold text-sm mb-2">Hour Range: <span id="hourRangeLabel">0 - 23</span></label>
+      <div id="hourSlider"></div>
+    </div>
+      <div id="legendOverlay" class="absolute top-4 right-4 bg-white bg-opacity-90 p-4 rounded shadow z-50 hidden">
         <button id="toggleLegendOverlay" class="text-gray-700 hover:text-gray-900 mb-2 font-semibold">Legend ▲</button>
-        <ul id="legendListOverlay" class="space-y-1 text-sm">
-            <!-- populated dynamically -->
-        </ul>
-        </div>
-
-      <div id="crimeMap" class="w-full h-[600px]"></div>
+        <ul id="legendListOverlay" class="space-y-1 text-sm"></ul>
+      </div>
+      <div class="overflow-hidden">
+        <div id="crimeMap" class="w-full h-[600px]"></div>
+      </div>
     </div>
 
-    <!-- Right Column Charts -->
+    <!-- Right Charts -->
     <div class="space-y-6">
       <div class="bg-white p-4 rounded shadow">
         <h3 class="font-semibold text-lg mb-2">Crime Type Distribution</h3>
@@ -122,10 +154,12 @@
     </div>
   </div>
 
+  <!-- DISCLAIMER -->
   <div id="disclaimer" class="grid grid-cols-1 gap-6">
     <div>
-  ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.</div>
-</div>
+      ⚠ <strong>Disclaimer:</strong> These are reported incidents. They do not necessarily represent confirmed crimes or convictions. Data is provided for informational purposes only.
+    </div>
+  </div>
 </div>
 
 <script>
@@ -162,6 +196,7 @@
     "warrant": "fa-gavel"
   };
 
+  // Initialize map
   const map = L.map('crimeMap').setView(CENTER, ZOOM);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' }).addTo(map);
   let markersLayer = L.layerGroup().addTo(map);
@@ -203,88 +238,63 @@
     document.getElementById('topNeighborhood').textContent = Object.entries(neighborhoods).sort((a,b)=>b[1]-a[1])[0]?.[0]||'N/A';
   }
 
-  function updateCharts(data){
-    if(window.charts) Object.values(window.charts).forEach(c=>c?.destroy());
-    window.charts={};
-
-    // Hourly
-    const hours = Array(24).fill(0);
-    data.forEach(d=>{ if(d.dateObj) hours[d.dateObj.getHours()]++; });
-    const ctxH = document.getElementById('chartHour').getContext('2d');
-    window.charts.chartHour = new Chart(ctxH, { type:'bar', data:{labels:Array.from(Array(24).keys()), datasets:[{label:'Crimes',data:hours,backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
-
-    // Day
-    const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const dayCounts = Array(7).fill(0);
-    data.forEach(d=>{ if(d.dateObj) dayCounts[d.dateObj.getDay()]++; });
-    const ctxD = document.getElementById('chartDay').getContext('2d');
-    window.charts.chartDay = new Chart(ctxD,{ type:'bar', data:{labels:days,datasets:[{label:'Crimes',data:dayCounts,backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
-
-    // Heatmap
-    const heatData = [];
-    data.forEach(d=>{ if(d.dateObj){ heatData.push({x:d.dateObj.getDay(),y:d.dateObj.getHours(),v:1}); } });
-    const ctxM = document.getElementById('chartHeatmap').getContext('2d');
-    window.charts.chartHeatmap = new Chart(ctxM,{ type:'matrix', data:{datasets:[{label:'Heat',data:heatData,backgroundColor:(ctx)=>{
-      const val = ctx.dataset.data[ctx.dataIndex].v;
-      return `rgba(124,44,44,${val})`;
-    }}]}, options:{scales:{x:{type:'category',labels:days},y:{type:'category',labels:Array.from(Array(24).keys()).reverse()}}} });
-
-    // Type
-    const typeCounts = {};
-    data.forEach(d=>typeCounts[d.type]=(typeCounts[d.type]||0)+1);
-    const ctxT = document.getElementById('chartType').getContext('2d');
-    window.charts.chartType = new Chart(ctxT,{ type:'bar', data:{labels:Object.keys(typeCounts),datasets:[{label:'Count',data:Object.values(typeCounts),backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
-
-    // Streets
-    const streetCounts = {};
-    data.forEach(d=>streetCounts[d.street]=(streetCounts[d.street]||0)+1);
-    const topStreets = Object.entries(streetCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-    const ctxS = document.getElementById('chartStreets').getContext('2d');
-    window.charts.chartStreets = new Chart(ctxS,{ type:'bar', data:{labels:topStreets.map(d=>d[0]),datasets:[{label:'Count',data:topStreets.map(d=>d[1]),backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
-
-    // Monthly
-    const monthCounts = Array(12).fill(0);
-    data.forEach(d=>{ if(d.dateObj) monthCounts[d.dateObj.getMonth()]++; });
-    const ctxMo = document.getElementById('chartMonth').getContext('2d');
-    window.charts.chartMonth = new Chart(ctxMo,{ type:'line', data:{labels:Array.from(Array(12).keys()).map(m=>m+1),datasets:[{label:'Crimes',data:monthCounts,borderColor:PALETTE[0],fill:false}]}, options:{responsive:true} });
-
-    // District
-    const districtCounts = {};
-    data.forEach(d=>districtCounts[d.district]=(districtCounts[d.district]||0)+1);
-    const ctxDist = document.getElementById('chartDistrict').getContext('2d');
-    window.charts.chartDistrict = new Chart(ctxDist,{ type:'bar', data:{labels:Object.keys(districtCounts),datasets:[{label:'Count',data:Object.values(districtCounts),backgroundColor:PALETTE[0]}]}, options:{responsive:true} });
-  }
-
-  // 1️⃣ Set default dates to yesterday
+  // 1️⃣ DOM elements first
 const startDateInput = document.getElementById('startDate');
 const endDateInput = document.getElementById('endDate');
+const hourLabel = document.getElementById('hourRangeLabel');
+const crimeTypeSelect = document.getElementById('crimeType');
 
+// 2️⃣ Set default dates to yesterday
 const today = new Date();
 const yesterday = new Date(today);
 yesterday.setDate(today.getDate() - 1);
-
 const yyyy = yesterday.getFullYear();
 const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
 const dd = String(yesterday.getDate()).padStart(2, '0');
 const yestStr = `${yyyy}-${mm}-${dd}`;
-
 startDateInput.value = yestStr;
 endDateInput.value = yestStr;
 
-// 2️⃣ Filtering function
-function applyDateFilter() {
+// 3️⃣ Hour slider
+let hourRange = [0, 23];
+noUiSlider.create(document.getElementById('hourSlider'), {
+  start: [0, 23],
+  connect: true,
+  range: { min: 0, max: 23 },
+  step: 1,
+  tooltips: false,
+  format: { to: value => Math.round(value), from: value => Number(value) }
+});
+function formatHour(hour, isEnd = false) {
+  const ampm = hour < 12 ? "AM" : "PM";
+  const h = hour % 12 === 0 ? 12 : hour % 12;
+  const minutes = isEnd ? "59" : "00"; // show 59 minutes for the end
+  return `${h}:${minutes} ${ampm}`;
+}
+
+// Update label whenever slider changes
+document.getElementById('hourSlider').noUiSlider.on('update', (values) => {
+  hourRange = values.map(v => parseInt(v));
+  hourLabel.textContent = `${formatHour(hourRange[0])} - ${formatHour(hourRange[1], true)}`;
+  applyFilters(); // re-render filtered data
+});
+
+
+// 4️⃣ Filter function
+function applyFilters() {
   const startVal = startDateInput.value;
   const endVal = endDateInput.value;
-  const typeVal = document.getElementById('crimeType').value;
+  const typeVal = crimeTypeSelect.value;
+  const start = startVal ? new Date(startVal+'T00:00:00') : null;
+  const end = endVal ? new Date(endVal+'T23:59:59') : null;
 
-  const start = startVal ? new Date(startVal + 'T00:00:00') : null;
-  const end = endVal ? new Date(endVal + 'T23:59:59') : null;
-
-  const filtered = normData.filter(d => {
-    if (!d.dateObj) return false;
-    if (start && d.dateObj < start) return false;
-    if (end && d.dateObj > end) return false;
-    if (typeVal && d.type?.toLowerCase() !== typeVal.toLowerCase()) return false;
+  const filtered = normData.filter(d=>{
+    if(!d.dateObj) return false;
+    const hour = d.dateObj.getHours();
+    if(hour < hourRange[0] || hour > hourRange[1]) return false;
+    if(start && d.dateObj < start) return false;
+    if(end && d.dateObj > end) return false;
+    if(typeVal && d.type.toLowerCase() !== typeVal.toLowerCase()) return false;
     return true;
   });
 
@@ -293,100 +303,159 @@ function applyDateFilter() {
   updateCharts(filtered);
 }
 
-// 3️⃣ Auto-apply filter whenever inputs change
-startDateInput.addEventListener('change', applyDateFilter);
-endDateInput.addEventListener('change', applyDateFilter);
-document.getElementById('crimeType').addEventListener('change', applyDateFilter);
-
-// 4️⃣ Call once after data loads to show yesterday's data immediately
-loadData().then(() => {
-  applyDateFilter();
-});
-
-
-
-  document.getElementById('filterBtn').addEventListener('click', applyDateFilter);
-    document.getElementById('resetBtn').addEventListener('click', () => {
-    document.getElementById('startDate').value = '';
-    document.getElementById('endDate').value = '';
-    document.getElementById('crimeType').value = '';
-    renderMarkers(normData);
-    updateSummary(normData);
-    updateCharts(normData);
-    });
+// 5️⃣ Event listeners
+startDateInput.addEventListener('change', applyFilters);
+endDateInput.addEventListener('change', applyFilters);
+crimeTypeSelect.addEventListener('change', applyFilters);
 
 
   async function loadData(){
-  document.getElementById('status').textContent='Loading data…';
-  try{
-    const res = await fetch(DATA_URL);
-    const raw = await res.json();
+    document.getElementById('status').textContent='Loading data…';
+    try{
+      const res = await fetch(DATA_URL);
+      const raw = await res.json();
+      normData = raw.map(d=>({
+        ...d,
+        type: d.incidentType || 'Unknown',
+        dateObj: new Date(d.datetime),
+        lat: parseFloat(d.lat),
+        lng: parseFloat(d.long),
+        address: d.address || '',
+        city: d.city || '',
+        street: d.address || '',
+        district: d.venue || '',
+        dateRaw: d.datetime
+      }));
+      // Populate crime type dropdown
+      const crimeTypeSelect = document.getElementById('crimeType');
+      crimeTypeSelect.innerHTML = '<option value="">All</option>';
+      [...new Set(normData.map(d=>d.type))].sort().forEach(t=>{
+        const opt = document.createElement('option'); opt.value=t; opt.textContent=t; crimeTypeSelect.appendChild(opt);
+      });
 
-    normData = raw.map(d=>({
-      ...d,
-      type: d.incidentType || 'Unknown',
-      dateObj: new Date(d.datetime),
-      lat: parseFloat(d.lat),
-      lng: parseFloat(d.long),
-      address: d.address || '',
-      city: d.city || '',
-      street: d.address || '',
-      district: d.venue || '',
-      dateRaw: d.datetime
-    }));
-
-    // Populate crime type dropdown
-    const crimeTypeSelect = document.getElementById('crimeType');
-    crimeTypeSelect.innerHTML = '<option value="">All</option>';
-    const types = [...new Set(normData.map(d=>d.type))].sort();
-    types.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t;
-      opt.textContent = t;
-      crimeTypeSelect.appendChild(opt);
-    });
-
-    // Do NOT render full data here!
-    // We'll render filtered data next
-  } catch(err){
-    console.error(err);
-    document.getElementById('status').textContent='Error loading data';
+      buildOverlayLegend();
+      applyFilters(); // initial render
+    } catch(err){
+      console.error(err);
+      document.getElementById('status').textContent='Error loading data';
+    }
   }
-}
 
-// Load data and immediately filter to yesterday
-loadData().then(() => {
-  applyDateFilter();
-});
+  // Build overlay legend
+  function buildOverlayLegend(){
+    const legendList = document.getElementById('legendListOverlay');
+    legendList.innerHTML='';
+    [...new Set(normData.map(d=>d.type))].sort().forEach(type=>{
+      const iconClass = ICONS[type.toLowerCase()] || "fa-map-marker-alt";
+      const li = document.createElement('li');
+      li.className = "flex items-center space-x-2";
+      li.innerHTML = `<i class="fa ${iconClass}" style="color:${PALETTE[0]}"></i><span>${type}</span>`;
+      legendList.appendChild(li);
+    });
+  }
 
+  document.getElementById('toggleLegendOverlay').addEventListener('click', ()=>{
+    const panel = document.getElementById('legendOverlay');
+    panel.classList.toggle('hidden');
+  });
 
-function buildOverlayLegend(){
-  const legendList = document.getElementById('legendListOverlay');
-  legendList.innerHTML = '';
+  function updateCharts(data) {
+  // Destroy old charts if they exist
+  if (!window.charts) window.charts = {};
+  Object.values(window.charts).forEach(c => {
+    if (c) c.destroy();
+  });
+  window.charts = {};
 
-  const types = [...new Set(normData.map(d=>d.type))].sort();
-  types.forEach(type=>{
-    const iconClass = ICONS[type.toLowerCase()] || "fa-map-marker-alt";
-    const li = document.createElement('li');
-    li.className = "flex items-center space-x-2";
+  // Hourly chart
+  const hours = Array(24).fill(0);
+  data.forEach(d => { if (d.dateObj) hours[d.dateObj.getHours()]++; });
+  const ctxH = document.getElementById('chartHour').getContext('2d');
+  window.charts.chartHour = new Chart(ctxH, {
+    type: 'bar',
+    data: { labels: Array.from(Array(24).keys()), datasets: [{ label: 'Crimes', data: hours, backgroundColor: PALETTE[0] }] },
+    options: { responsive: true }
+  });
 
-    li.innerHTML = `<i class="fa ${iconClass}" style="color:${PALETTE[0]}"></i><span>${type}</span>`;
-    legendList.appendChild(li);
+  // Day chart
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayCounts = Array(7).fill(0);
+  data.forEach(d => { if (d.dateObj) dayCounts[d.dateObj.getDay()]++; });
+  const ctxD = document.getElementById('chartDay').getContext('2d');
+  window.charts.chartDay = new Chart(ctxD, {
+    type: 'bar',
+    data: { labels: days, datasets: [{ label: 'Crimes', data: dayCounts, backgroundColor: PALETTE[0] }] },
+    options: { responsive: true }
+  });
+
+  // Heatmap
+  const heatData = [];
+  data.forEach(d => { if (d.dateObj) heatData.push({x: d.dateObj.getDay(), y: d.dateObj.getHours(), v: 1}); });
+  const ctxM = document.getElementById('chartHeatmap').getContext('2d');
+  window.charts.chartHeatmap = new Chart(ctxM, {
+    type: 'matrix',
+    data: {
+      datasets: [{
+        label: 'Heat',
+        data: heatData,
+        backgroundColor: ctx => `rgba(124,44,44,1)`
+      }]
+    },
+    options: {
+      scales: {
+        x: { type: 'category', labels: days },
+        y: { type: 'category', labels: Array.from(Array(24).keys()).reverse() }
+      }
+    }
+  });
+
+  // Type distribution
+  const typeCounts = {};
+  data.forEach(d => typeCounts[d.type] = (typeCounts[d.type] || 0) + 1);
+  const ctxT = document.getElementById('chartType').getContext('2d');
+  window.charts.chartType = new Chart(ctxT, {
+    type: 'bar',
+    data: { labels: Object.keys(typeCounts), datasets: [{ label: 'Count', data: Object.values(typeCounts), backgroundColor: PALETTE[0] }] },
+    options: { responsive: true }
+  });
+
+  // Streets
+  const streetCounts = {};
+  data.forEach(d => streetCounts[d.street] = (streetCounts[d.street] || 0) + 1);
+  const topStreets = Object.entries(streetCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const ctxS = document.getElementById('chartStreets').getContext('2d');
+  window.charts.chartStreets = new Chart(ctxS, {
+    type: 'bar',
+    data: { labels: topStreets.map(d=>d[0]), datasets: [{ label: 'Count', data: topStreets.map(d=>d[1]), backgroundColor: PALETTE[0] }] },
+    options: { responsive: true }
+  });
+
+  // Monthly trend
+  const monthCounts = Array(12).fill(0);
+  data.forEach(d => { if(d.dateObj) monthCounts[d.dateObj.getMonth()]++; });
+  const ctxMo = document.getElementById('chartMonth').getContext('2d');
+  window.charts.chartMonth = new Chart(ctxMo, {
+    type: 'line',
+    data: { labels: Array.from(Array(12).keys()).map(m=>m+1), datasets:[{label:'Crimes', data:monthCounts, borderColor:PALETTE[0], fill:false}] },
+    options: { responsive:true }
+  });
+
+  // Districts
+  const districtCounts = {};
+  data.forEach(d => districtCounts[d.district] = (districtCounts[d.district] || 0) + 1);
+  const ctxDist = document.getElementById('chartDistrict').getContext('2d');
+  window.charts.chartDistrict = new Chart(ctxDist, {
+    type:'bar',
+    data:{ labels: Object.keys(districtCounts), datasets:[{label:'Count', data: Object.values(districtCounts), backgroundColor: PALETTE[0]}]},
+    options:{ responsive:true }
   });
 }
 
-// Toggle show/hide overlay legend
-document.getElementById('toggleLegendOverlay').addEventListener('click', ()=>{
-  const panel = document.getElementById('legendOverlay');
-  panel.classList.toggle('hidden');
-});
 
-// Call after data loads
-buildOverlayLegend();
-
+  // Load data
+  await loadData();
 
 })();
 </script>
-
 </body>
 </html>
