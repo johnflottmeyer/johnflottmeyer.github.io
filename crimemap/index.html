@@ -52,93 +52,89 @@ body { margin:0; font-family: "Roboto", Arial, sans-serif; }
   background-color: #5e1f1f;
 }
 
-/* Chart Drawer (fixed & responsive) */
+/* Full-screen drawer (dashboard shelf) */
 .drawer {
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(8px);
-  z-index: 2000;
-  transform: translateX(100%);
-  transition: transform 0.35s ease-in-out;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(4px);
+  transform: translateY(100%);
+  transition: transform 0.45s ease;
   overflow-y: auto;
+  z-index: 9999;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
 }
 
-/* Slide in when open */
 .drawer.open {
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
-/* Header bar */
-.drawer-header {
-  position: sticky;
-  top: 0;
-  background: #7C2C2C;
-  color: #fff;
-  padding: 15px 20px;
-  font-size: 18px;
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 10;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.drawer-header button {
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  border: none;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background 0.2s ease;
-}
-.drawer-header button:hover {
-  background: rgba(255,255,255,0.3);
-}
-
-/* Charts layout */
+/* Grid layout for charts */
 .drawer-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 30px;
-  padding: 30px;
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding-bottom: 80px;
 }
 
-/* Each chart canvas container */
+/* Individual chart containers */
+.chart-container {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.2rem 1.5rem 1.8rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart titles */
+.chart-title {
+  font-size: 20px !important;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+  color: #222;
+}
+
+/* Chart canvas */
 .drawer canvas {
   width: 100% !important;
-  height: 400px !important;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  padding: 10px;
+  height: 380px !important;
 }
 
-/* Chart titles & text */
-.chartjs-render-monitor {
-  font-size: 16px !important;
-}
-.chart-title {
-  font-size: 18px !important;
-  font-weight: 600;
+/* Tablet layout */
+@media (max-width: 1100px) {
+  .drawer-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* Mobile adjustments */
-@media (max-width: 700px) {
+/* Mobile layout */
+@media (max-width: 768px) {
   .drawer-content {
     grid-template-columns: 1fr;
-    padding: 15px;
+    gap: 20px;
+  }
+  .drawer {
+    padding: 1rem;
   }
   .drawer canvas {
     height: 320px !important;
   }
+  .chart-title {
+    font-size: 18px !important;
+  }
 }
+
 
 /* Chart panel readability and spacing */
 #chartsPanel {
@@ -378,12 +374,36 @@ canvas {
     };
     legend.addTo(map);
   }
-  // Global Chart.js font and color settings
+
+
+  // Global Chart.js settings for readability and consistency
+Chart.defaults.font.family = "Roboto, sans-serif";
+Chart.defaults.color = "#111";
+Chart.defaults.font.size = 18;
+Chart.defaults.plugins.title.font = { size: 22, weight: "bold" };
+Chart.defaults.plugins.legend.labels.font = { size: 18 };
+Chart.defaults.plugins.tooltip.bodyFont = { size: 16 };
+Chart.defaults.plugins.tooltip.titleFont = { size: 16 };
+Chart.defaults.scales = {
+  x: {
+    ticks: { color: "#222", font: { size: 16, weight: "500" } },
+    title: { color: "#000", font: { size: 18, weight: "600" } }
+  },
+  y: {
+    ticks: { color: "#222", font: { size: 16, weight: "500" } },
+    title: { color: "#000", font: { size: 18, weight: "600" } }
+  }
+};
+
+// Slightly smaller on mobile
+if (window.innerWidth < 768) {
   Chart.defaults.font.size = 14;
-  Chart.defaults.font.family = "Roboto, sans-serif";
-  Chart.defaults.color = "#222";
-  Chart.defaults.plugins.title.font = { size: 18, weight: "bold" };
-  Chart.defaults.plugins.legend.labels.font = { size: 14 };
+  Chart.defaults.plugins.title.font.size = 18;
+  Chart.defaults.plugins.legend.labels.font.size = 14;
+}
+
+
+
 
   function updateCharts(data){
   if(!document.getElementById("chart1")) return;
